@@ -107,7 +107,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
 									})
 								}
 							>
-								<option value='ANY'>Any</option>
+								<option value='ANY'>ANY</option>
 								<option value='GET'>GET</option>
 								<option value='POST'>POST</option>
 								<option value='PUT'>PUT</option>

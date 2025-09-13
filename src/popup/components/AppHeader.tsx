@@ -2,6 +2,7 @@ import { AddIcon, InfoIcon } from '@chakra-ui/icons';
 import { Badge, Box, HStack, IconButton, Image, Text, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 import { FaPause, FaPlay } from 'react-icons/fa6';
+import { FiDownload, FiUpload } from 'react-icons/fi';
 import { IoIosNuclear } from 'react-icons/io';
 import { API_DISABLED, API_ENABLED } from '../../assets';
 
@@ -12,6 +13,8 @@ interface AppHeaderProps {
 	onAddNewRule: () => void;
 	onAddExampleRule: () => void;
 	onClearAllRules: () => void;
+	onExportRules: () => void;
+	onImportRules: () => void;
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({
@@ -21,6 +24,8 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 	onAddNewRule,
 	onAddExampleRule,
 	onClearAllRules,
+	onExportRules,
+	onImportRules,
 }) => {
 	return (
 		<Box className='bg-white p-3 border-b border-b-gray-700'>
@@ -34,6 +39,26 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 				</HStack>
 
 				<HStack spacing={2}>
+					<Tooltip label='Import Rules' placement='bottom'>
+						<IconButton
+							aria-label='Import Rules'
+							icon={<FiDownload />}
+							onClick={onImportRules}
+							size='sm'
+							variant='outline'
+							colorScheme='purple'
+						/>
+					</Tooltip>
+					<Tooltip label='Export Rules' placement='bottom'>
+						<IconButton
+							aria-label='Export Rules'
+							icon={<FiUpload />}
+							onClick={onExportRules}
+							size='sm'
+							variant='outline'
+							colorScheme='purple'
+						/>
+					</Tooltip>
 					<Tooltip label='Add Example Rule' placement='bottom'>
 						<IconButton
 							aria-label='Add Example Rule'

@@ -14,6 +14,8 @@ const App: React.FC = () => {
 		addExampleRule,
 		getRuleCount,
 		clearAllRules,
+		exportRules,
+		importRules,
 	} = useRuleManagement({ popupState, setPopupState, saveRules });
 
 	if (loading) {
@@ -35,6 +37,8 @@ const App: React.FC = () => {
 					onAddNewRule={addNewRule}
 					onAddExampleRule={addExampleRule}
 					onClearAllRules={clearAllRules}
+					onExportRules={exportRules}
+					onImportRules={importRules}
 				/>
 
 				{/* Rules Section */}

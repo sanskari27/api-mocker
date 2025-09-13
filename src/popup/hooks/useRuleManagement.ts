@@ -104,6 +104,114 @@ export const useRuleManagement = ({
 		});
 	};
 
+	const exportRules = (): void => {
+		try {
+			const currentRules = Array.isArray(popupState.rules) ? popupState.rules : [];
+			const exportData = {
+				version: '1.0',
+				exportedAt: new Date().toISOString(),
+				rules: currentRules,
+			};
+
+			const dataStr = JSON.stringify(exportData, null, 2);
+			const dataBlob = new Blob([dataStr], { type: 'application/json' });
+			const url = URL.createObjectURL(dataBlob);
+
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = `api-mocker-rules-${new Date().toISOString().split('T')[0]}.json`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
+
+			toast({
+				title: 'Rules exported successfully',
+				status: 'success',
+				duration: 2000,
+				isClosable: true,
+			});
+		} catch (error) {
+			toast({
+				title: 'Export failed',
+				description: 'Failed to export rules',
+				status: 'error',
+				duration: 3000,
+				isClosable: true,
+			});
+		}
+	};
+
+	const importRules = (): void => {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.json';
+		input.onchange = (event) => {
+			const file = (event.target as HTMLInputElement).files?.[0];
+			if (!file) return;
+
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				try {
+					const content = e.target?.result as string;
+					const importData = JSON.parse(content);
+
+					// Validate the imported data structure
+					if (!importData.rules || !Array.isArray(importData.rules)) {
+						throw new Error('Invalid file format: rules array not found');
+					}
+
+					// Validate each rule has required properties
+					const validRules = importData.rules.filter(
+						(rule: any) =>
+							rule.id &&
+							typeof rule.url === 'string' &&
+							typeof rule.method === 'string' &&
+							typeof rule.responseCode === 'number' &&
+							typeof rule.responseBody === 'string' &&
+							typeof rule.enabled === 'boolean'
+					);
+
+					if (validRules.length === 0) {
+						throw new Error('No valid rules found in the file');
+					}
+
+					// Generate new IDs for imported rules to avoid conflicts
+					const rulesWithNewIds = validRules.map((rule: any) => ({
+						...rule,
+						id: generateRuleId(),
+						requestCount: 0, // Reset request count for imported rules
+					}));
+
+					// Merge with existing rules
+					const currentRules = Array.isArray(popupState.rules) ? popupState.rules : [];
+					const updatedRules = [...currentRules, ...rulesWithNewIds];
+
+					setPopupState((prev) => ({ ...prev, rules: updatedRules }));
+					saveRules(updatedRules);
+
+					toast({
+						title: 'Rules imported successfully',
+						description: `${rulesWithNewIds.length} rules imported`,
+						status: 'success',
+						duration: 3000,
+						isClosable: true,
+					});
+				} catch (error) {
+					toast({
+						title: 'Import failed',
+						description: error instanceof Error ? error.message : 'Invalid file format',
+						status: 'error',
+						duration: 3000,
+						isClosable: true,
+					});
+				}
+			};
+			reader.readAsText(file);
+		};
+		input.click();
+	};
+
 	return {
 		addNewRule,
 		updateRule,
@@ -112,5 +220,7 @@ export const useRuleManagement = ({
 		addExampleRule,
 		getRuleCount,
 		clearAllRules,
+		exportRules,
+		importRules,
 	};
 };
