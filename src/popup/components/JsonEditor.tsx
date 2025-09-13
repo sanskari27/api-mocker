@@ -131,6 +131,27 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 				seedSearchStringFromSelection: 'always',
 				autoFindInSelection: 'multiline',
 			},
+			// Enable multi-cursor support
+			multiCursorModifier: 'ctrlCmd',
+			// Enable quick suggestions
+			quickSuggestions: {
+				other: true,
+				comments: false,
+				strings: true,
+			},
+			// Enable parameter hints
+			parameterHints: {
+				enabled: true,
+			},
+			// Enable hover provider
+			hover: {
+				enabled: true,
+				delay: 300,
+			},
+			// Enable context menu
+			contextmenu: true,
+			// Enable color picker
+			colorDecorators: true,
 		});
 
 		// Add format command with different shortcut

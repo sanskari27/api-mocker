@@ -77,7 +77,15 @@ module.exports = {
                 "replace",
                 "format",
                 "indentation",
-                "suggest"
+                "suggest",
+                "multiCursor",
+                "codeAction",
+                "parameterHints",
+                "quickOpen",
+                "snippet",
+                "hover",
+                "contextmenu",
+                "colorPicker"
             ],
             publicPath: '',
         }),
