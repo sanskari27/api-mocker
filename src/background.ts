@@ -94,10 +94,11 @@ class BackgroundService {
 		const result = await chrome.storage.local.get(this.storageKey);
 		const data = result[this.storageKey] || { globalRules: [], tabStates: {} };
 
-		// Initialize requestCount for existing rules that don't have it
+		// Initialize requestCount and enabled for existing rules that don't have them
 		data.globalRules = data.globalRules.map((rule: MockRule) => ({
 			...rule,
 			requestCount: rule.requestCount || 0,
+			enabled: rule.enabled !== false, // Default to true for backward compatibility
 		}));
 
 		return data;

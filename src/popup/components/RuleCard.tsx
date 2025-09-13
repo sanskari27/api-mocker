@@ -12,6 +12,7 @@ import {
 	IconButton,
 	Input,
 	Select,
+	Switch,
 	Tab,
 	TabList,
 	TabPanel,
@@ -61,9 +62,17 @@ const RuleCard: React.FC<RuleCardProps> = ({
 					</HStack>
 				</Box>
 				<HStack spacing={2}>
-					<Badge size='sm' colorScheme='green' variant='solid'>
+					<Badge size='sm' colorScheme='blue' variant='outline'>
 						{rule.requestCount || 0} requests
 					</Badge>
+					<Box onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
+						<Switch
+							isChecked={rule.enabled}
+							onChange={(e) => onUpdate(rule.id, { enabled: e.target.checked })}
+							colorScheme='green'
+							size='sm'
+						/>
+					</Box>
 					<AccordionIcon />
 				</HStack>
 			</AccordionButton>

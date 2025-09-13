@@ -27,6 +27,7 @@ export const useRuleManagement = ({
 			responseHeaders: { 'Content-Type': 'application/json' },
 			responseBody: '{}',
 			requestCount: 0,
+			enabled: true,
 		};
 
 		// Ensure rules is an array before spreading
@@ -77,6 +78,7 @@ export const useRuleManagement = ({
 				2
 			),
 			requestCount: 0,
+			enabled: true,
 		};
 
 		// Ensure rules is an array before spreading

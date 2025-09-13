@@ -6,6 +6,7 @@ export interface MockRule {
 	responseHeaders: Record<string, string>;
 	responseBody: string;
 	requestCount: number;
+	enabled: boolean;
 }
 
 export interface TabMockState {

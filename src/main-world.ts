@@ -8,6 +8,7 @@ interface MockRule {
 	responseHeaders: Record<string, string>;
 	responseBody: string;
 	requestCount: number;
+	enabled: boolean;
 }
 
 class ApiMockerMainWorld {
@@ -317,7 +318,8 @@ class ApiMockerMainWorld {
 		for (const rule of this.rules) {
 			const urlMatch = this.urlMatches(url, rule.url);
 			const methodMatch = this.methodMatches(method, rule.method);
-			if (urlMatch && methodMatch) {
+			const enabled = rule.enabled !== false; // Default to true for backward compatibility
+			if (urlMatch && methodMatch && enabled) {
 				return rule;
 			}
 		}
