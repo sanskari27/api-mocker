@@ -8,6 +8,7 @@ interface RulesListProps {
 	rules: MockRule[];
 	onUpdateRule: (ruleId: string, updates: Partial<MockRule>) => void;
 	onDeleteRule: (ruleId: string) => void;
+	onCloneRule: (ruleId: string) => void;
 	onUpdateRuleHeaders: (ruleId: string, headers: Record<string, string>) => void;
 }
 
@@ -15,6 +16,7 @@ const RulesList: React.FC<RulesListProps> = ({
 	rules,
 	onUpdateRule,
 	onDeleteRule,
+	onCloneRule,
 	onUpdateRuleHeaders,
 }) => {
 	if (!Array.isArray(rules) || rules.length === 0) {
@@ -35,6 +37,7 @@ const RulesList: React.FC<RulesListProps> = ({
 						index={index}
 						onUpdate={onUpdateRule}
 						onDelete={onDeleteRule}
+						onClone={onCloneRule}
 						onUpdateHeaders={onUpdateRuleHeaders}
 					/>
 				))}

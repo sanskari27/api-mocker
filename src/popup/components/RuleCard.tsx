@@ -1,4 +1,4 @@
-import { DeleteIcon } from '@chakra-ui/icons';
+import { CopyIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
 	AccordionButton,
 	AccordionIcon,
@@ -32,6 +32,7 @@ interface RuleCardProps {
 	index: number;
 	onUpdate: (ruleId: string, updates: Partial<MockRule>) => void;
 	onDelete: (ruleId: string) => void;
+	onClone: (ruleId: string) => void;
 	onUpdateHeaders: (ruleId: string, headers: Record<string, string>) => void;
 }
 
@@ -40,6 +41,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
 	index,
 	onUpdate,
 	onDelete,
+	onClone,
 	onUpdateHeaders,
 }) => {
 	return (
@@ -160,8 +162,18 @@ const RuleCard: React.FC<RuleCardProps> = ({
 						</Tabs>
 					</FormControl>
 
-					{/* Delete Button */}
-					<HStack justify='flex-end' marginTop={-2}>
+					{/* Action Buttons */}
+					<HStack justify='flex-end' marginTop={-2} spacing={2}>
+						<Tooltip label='Clone Rule' placement='top'>
+							<IconButton
+								aria-label='Clone Rule'
+								icon={<CopyIcon />}
+								size='sm'
+								colorScheme='blue'
+								variant='outline'
+								onClick={() => onClone(rule.id)}
+							/>
+						</Tooltip>
 						<Tooltip label='Delete Rule' placement='top'>
 							<IconButton
 								aria-label='Delete Rule'

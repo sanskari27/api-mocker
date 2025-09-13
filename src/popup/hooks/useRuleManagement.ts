@@ -61,6 +61,48 @@ export const useRuleManagement = ({
 		});
 	};
 
+	const cloneRule = (ruleId: string): void => {
+		// Ensure rules is an array before finding
+		const currentRules = Array.isArray(popupState.rules) ? popupState.rules : [];
+		const ruleToClone = currentRules.find((rule) => rule.id === ruleId);
+
+		if (!ruleToClone) {
+			toast({
+				title: 'Rule not found',
+				description: 'Could not find the rule to clone',
+				status: 'error',
+				duration: 2000,
+				isClosable: true,
+			});
+			return;
+		}
+
+		// Create a clone with new ID and reset request count
+		const clonedRule: MockRule = {
+			...ruleToClone,
+			id: generateRuleId(),
+			requestCount: 0,
+		};
+
+		// Find the index of the original rule and insert the clone right after it
+		const originalIndex = currentRules.findIndex((rule) => rule.id === ruleId);
+		const updatedRules = [
+			...currentRules.slice(0, originalIndex + 1),
+			clonedRule,
+			...currentRules.slice(originalIndex + 1),
+		];
+
+		setPopupState((prev) => ({ ...prev, rules: updatedRules }));
+		saveRules(updatedRules);
+		toast({
+			title: 'Rule cloned',
+			description: 'Rule has been duplicated and placed after the original',
+			status: 'success',
+			duration: 2000,
+			isClosable: true,
+		});
+	};
+
 	const updateRuleHeaders = (ruleId: string, headers: Record<string, string>): void => {
 		updateRule(ruleId, { responseHeaders: headers });
 	};
@@ -216,6 +258,7 @@ export const useRuleManagement = ({
 		addNewRule,
 		updateRule,
 		deleteRule,
+		cloneRule,
 		updateRuleHeaders,
 		addExampleRule,
 		getRuleCount,

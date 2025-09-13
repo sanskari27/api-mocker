@@ -10,6 +10,7 @@ const App: React.FC = () => {
 		addNewRule,
 		updateRule,
 		deleteRule,
+		cloneRule,
 		updateRuleHeaders,
 		addExampleRule,
 		getRuleCount,
@@ -46,6 +47,7 @@ const App: React.FC = () => {
 					rules={popupState.rules}
 					onUpdateRule={updateRule}
 					onDeleteRule={deleteRule}
+					onCloneRule={cloneRule}
 					onUpdateRuleHeaders={updateRuleHeaders}
 				/>
 			</VStack>

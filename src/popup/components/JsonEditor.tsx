@@ -243,7 +243,7 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 						>
 							{isExpanded ? 'Collapse' : 'Expand'}
 						</Button>
-						<Button size='xs' variant='outline' colorScheme='red' onClick={clearEditor}>
+						<Button size='xs' variant='outline' colorScheme='red' onClick={clearEditor} hidden>
 							Clear
 						</Button>
 					</HStack>
