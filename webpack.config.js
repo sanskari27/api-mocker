@@ -73,6 +73,8 @@ module.exports = {
                 "bracketMatching",
                 "wordHighlighter",
                 "find",
+                "findWidget",
+                "replace",
                 "format",
                 "indentation",
                 "suggest"

@@ -126,10 +126,18 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 				bracketPairs: true,
 				indentation: true,
 			},
+			// Enable find and replace functionality
+			find: {
+				seedSearchStringFromSelection: 'always',
+				autoFindInSelection: 'multiline',
+			},
 		});
 
-		// Add format command
-		editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyF, formatJson);
+		// Add format command with different shortcut
+		editor.addCommand(
+			monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF,
+			formatJson
+		);
 
 		// Set up change handler
 		editor.onDidChangeModelContent(() => {
