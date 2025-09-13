@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for better integration */
+body {
+	@apply font-sans;
+}
+
+.json-editor {
+	@apply font-mono text-sm;
+}
+
+.rule-item {
+	@apply border-l-4 border-blue-400 bg-blue-50 p-3 mb-2 rounded-r;
+}
+
+.error-message {
+	@apply text-red-600 text-sm mt-1;
+}

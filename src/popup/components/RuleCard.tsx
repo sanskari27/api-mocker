@@ -1,0 +1,173 @@
+import { DeleteIcon } from '@chakra-ui/icons';
+import {
+	AccordionButton,
+	AccordionIcon,
+	AccordionItem,
+	AccordionPanel,
+	Badge,
+	Box,
+	FormControl,
+	FormLabel,
+	HStack,
+	IconButton,
+	Input,
+	Select,
+	Tab,
+	TabList,
+	TabPanel,
+	TabPanels,
+	Tabs,
+	Text,
+	Tooltip,
+	VStack,
+} from '@chakra-ui/react';
+import React from 'react';
+import { MockRule } from '../../types';
+import HeadersEditor from './HeadersEditor';
+import JsonEditor from './JsonEditor';
+
+interface RuleCardProps {
+	rule: MockRule;
+	index: number;
+	onUpdate: (ruleId: string, updates: Partial<MockRule>) => void;
+	onDelete: (ruleId: string) => void;
+	onUpdateHeaders: (ruleId: string, headers: Record<string, string>) => void;
+}
+
+const RuleCard: React.FC<RuleCardProps> = ({
+	rule,
+	index,
+	onUpdate,
+	onDelete,
+	onUpdateHeaders,
+}) => {
+	return (
+		<AccordionItem border='1px' borderColor='gray.200' mb={2} borderRadius='md'>
+			<AccordionButton className='hover:bg-gray-50' p={3}>
+				<Box flex='1' textAlign='left'>
+					<HStack>
+						<Badge size='sm' colorScheme='gray' variant='solid'>
+							#{index + 1}
+						</Badge>
+						<Badge size='sm' colorScheme='blue'>
+							{rule.method}
+						</Badge>
+						<Text fontSize='sm' className='font-mono font-semibold'>
+							{rule.url || 'New Rule'}
+						</Text>
+						<Badge size='sm' variant='outline'>
+							{rule.responseCode}
+						</Badge>
+					</HStack>
+				</Box>
+				<HStack spacing={2}>
+					<Badge size='sm' colorScheme='green' variant='solid'>
+						{rule.requestCount || 0} requests
+					</Badge>
+					<AccordionIcon />
+				</HStack>
+			</AccordionButton>
+			<AccordionPanel pb={2} pt={0}>
+				<VStack spacing={2} align='stretch'>
+					{/* URL Input */}
+					<FormControl>
+						<FormLabel fontSize='sm' fontWeight='semibold'>
+							URL Pattern
+						</FormLabel>
+						<Input
+							size='sm'
+							value={rule.url}
+							onChange={(e) => onUpdate(rule.id, { url: e.target.value })}
+							placeholder='e.g., /api/user or *user*'
+							className='font-mono text-xs'
+						/>
+					</FormControl>
+
+					{/* Method and Response Code */}
+					<HStack spacing={2}>
+						<FormControl>
+							<FormLabel fontSize='sm' fontWeight='semibold'>
+								Method
+							</FormLabel>
+							<Select
+								size='sm'
+								value={rule.method}
+								onChange={(e) =>
+									onUpdate(rule.id, {
+										method: e.target.value as MockRule['method'],
+									})
+								}
+							>
+								<option value='ANY'>Any</option>
+								<option value='GET'>GET</option>
+								<option value='POST'>POST</option>
+								<option value='PUT'>PUT</option>
+								<option value='DELETE'>DELETE</option>
+								<option value='PATCH'>PATCH</option>
+							</Select>
+						</FormControl>
+						<FormControl>
+							<FormLabel fontSize='sm' fontWeight='semibold'>
+								Status Code
+							</FormLabel>
+							<Input
+								size='sm'
+								type='number'
+								value={rule.responseCode}
+								onChange={(e) =>
+									onUpdate(rule.id, {
+										responseCode: parseInt(e.target.value) || 200,
+									})
+								}
+								min={100}
+								max={599}
+							/>
+						</FormControl>
+					</HStack>
+
+					{/* Response Headers and Body Tabs */}
+					<FormControl>
+						<Tabs defaultIndex={0} size='sm'>
+							<TabList>
+								<Tab>Response Body</Tab>
+								<Tab>Headers</Tab>
+							</TabList>
+							<TabPanels>
+								<TabPanel px={0} py={2}>
+									<JsonEditor
+										onChange={(value) => onUpdate(rule.id, { responseBody: value })}
+										value={rule.responseBody}
+										height='200px'
+										placeholder='Enter JSON Response Body...'
+									/>
+								</TabPanel>
+								<TabPanel px={0} py={2}>
+									<HeadersEditor
+										headers={rule.responseHeaders}
+										onChange={(headers) => onUpdateHeaders(rule.id, headers)}
+									/>
+								</TabPanel>
+							</TabPanels>
+						</Tabs>
+					</FormControl>
+
+					{/* Delete Button */}
+					<HStack justify='flex-end' marginTop={-2}>
+						<Tooltip label='Delete Rule' placement='top'>
+							<IconButton
+								aria-label='Delete Rule'
+								icon={<DeleteIcon />}
+								size='sm'
+								colorScheme='red'
+								variant='outline'
+								onClick={() => onDelete(rule.id)}
+							/>
+						</Tooltip>
+					</HStack>
+				</VStack>
+			</AccordionPanel>
+		</AccordionItem>
+	);
+};
+
+export default RuleCard;

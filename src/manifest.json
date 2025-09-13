@@ -1,0 +1,58 @@
+{
+    "manifest_version": 3,
+    "name": "API Mocker",
+    "version": "1.0.0",
+    "description": "Mock API requests with custom responses on a per-tab basis",
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "run_at": "document_start"
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "main-world.js"
+            ],
+            "run_at": "document_start",
+            "world": "MAIN"
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "API Mocker"
+    },
+    "icons": {
+        "16": "api-disabled.png",
+        "32": "api-disabled.png",
+        "48": "api-disabled.png",
+        "128": "api-disabled.png"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "content.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}
