@@ -13,6 +13,7 @@
         "@chakra-ui/react": "^2.8.2",
         "@emotion/react": "^11.11.1",
         "@emotion/styled": "^11.11.0",
+        "framer-motion": "^12.23.12",
         "monaco-editor": "^0.52.2",
         "monaco-editor-webpack-plugin": "^7.1.0",
         "react": "^18.2.0",
