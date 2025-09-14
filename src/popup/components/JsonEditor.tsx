@@ -21,6 +21,31 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 	const editorRef = useRef<HTMLDivElement>(null);
 	const monacoEditorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
 
+	// Enable/disable handleMouseWheel based on mouse click inside/outside editor
+	useEffect(() => {
+		const handleClick = (event: MouseEvent) => {
+			const editorNode = editorRef.current;
+			const isInside = editorNode && editorNode.contains(event.target as Node);
+			if (monacoEditorRef.current) {
+				const editor = monacoEditorRef.current;
+				const opts = editor.getRawOptions();
+				if (isInside) {
+					if (opts.scrollbar && opts.scrollbar.handleMouseWheel === false) {
+						editor.updateOptions({ scrollbar: { ...opts.scrollbar, handleMouseWheel: true } });
+					}
+				} else {
+					if (opts.scrollbar && opts.scrollbar.handleMouseWheel !== false) {
+						editor.updateOptions({ scrollbar: { ...opts.scrollbar, handleMouseWheel: false } });
+					}
+				}
+			}
+		};
+		document.addEventListener('mousedown', handleClick);
+		return () => {
+			document.removeEventListener('mousedown', handleClick);
+		};
+	}, []);
+
 	// Validate JSON
 	const validateJson = useCallback((jsonString: string) => {
 		if (!jsonString || jsonString.trim() === '') {
@@ -152,6 +177,11 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 			contextmenu: true,
 			// Enable color picker
 			colorDecorators: true,
+			scrollbar: {
+				vertical: 'visible',
+				horizontal: 'visible',
+				handleMouseWheel: false,
+			},
 		});
 
 		// Add format command with different shortcut

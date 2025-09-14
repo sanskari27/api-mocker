@@ -52,15 +52,15 @@ const RuleCard: React.FC<RuleCardProps> = ({
 						<Badge size='sm' colorScheme='gray' variant='solid'>
 							#{index + 1}
 						</Badge>
-						<Badge size='sm' colorScheme='blue'>
+						<Badge size='sm' colorScheme='blue' width={'10'} textAlign={'center'}>
 							{rule.method}
+						</Badge>
+						<Badge size='sm' variant='outline'>
+							{rule.responseCode}
 						</Badge>
 						<Text fontSize='sm' className='font-mono font-semibold'>
 							{rule.url || 'New Rule'}
 						</Text>
-						<Badge size='sm' variant='outline'>
-							{rule.responseCode}
-						</Badge>
 					</HStack>
 				</Box>
 				<HStack spacing={2}>

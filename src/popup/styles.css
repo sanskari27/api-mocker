@@ -5,6 +5,8 @@
 /* Custom styles for better integration */
 body {
 	@apply font-sans;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
 }
 
 .json-editor {
@@ -17,4 +19,8 @@ body {
 
 .error-message {
 	@apply text-red-600 text-sm mt-1;
+}
+
+::-webkit-scrollbar {
+	display: none;
 }
