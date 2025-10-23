@@ -13,6 +13,7 @@ import {
 import React from 'react';
 import { FiDownload, FiTrash2, FiUpload } from 'react-icons/fi';
 import { getSystemTheme, getThemeClasses, useTheme } from '../contexts/ThemeContext';
+import { getInputThemeProps } from '../utils/themeUtils';
 import DeleteWarningDialog, { useDeleteDialogState } from './DeleteWarningDialog';
 
 interface SettingsPageProps {
@@ -36,6 +37,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 }) => {
 	const { theme: currentTheme } = useTheme();
 	const themeClasses = getThemeClasses(currentTheme);
+	const inputThemeProps = getInputThemeProps(theme);
 
 	const {
 		isOpen: isDeleteDialogOpen,
@@ -106,6 +108,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 										width='200px'
 										rounded={'md'}
 										className={`${themeClasses.input}`}
+										{...inputThemeProps}
 									>
 										<option value='system'>System</option>
 										<option value='light'>Light</option>
@@ -182,7 +185,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 					<Box>
 						<Text className={`font-bold text-xl ${themeClasses.text} mb-1`}>Danger Zone</Text>
 
-						<Box className={`border border-red-300 rounded p-4 ${themeClasses.bgCard} shadow-sm`}>
+						<Box className={`border border-red-400 rounded p-4 ${themeClasses.bgCard} shadow-sm`}>
 							<HStack justify='space-between' align='center'>
 								<VStack align='start' spacing={1}>
 									<Text className={`font-semibold ${themeClasses.text}`}>Delete All Rules</Text>

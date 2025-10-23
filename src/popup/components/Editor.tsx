@@ -1,7 +1,7 @@
 import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
 import * as monaco from 'monaco-editor';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { getThemeClasses, useTheme } from '../contexts/ThemeContext';
+import { getResolvedTheme, getThemeClasses, useTheme } from '../contexts/ThemeContext';
 
 interface EditorProps {
 	value: string;
@@ -142,7 +142,7 @@ const Editor: React.FC<EditorProps> = ({
 			minimap: { enabled: true },
 			fontSize: 12,
 			fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
-			theme: 'vs-light',
+			theme: getResolvedTheme(currentTheme) === 'dark' ? 'vs-dark' : 'vs-light',
 			tabSize: 2,
 			insertSpaces: true,
 			detectIndentation: true,
@@ -257,7 +257,7 @@ const Editor: React.FC<EditorProps> = ({
 		<Box position='relative'>
 			<VStack spacing={2} align='stretch'>
 				<HStack justify='space-between' align='center'>
-					<Text fontSize='xs' color='gray.600' fontWeight='medium'>
+					<Text fontSize='xs' fontWeight='medium' className={themeClasses.textSecondary}>
 						JSON Editor
 					</Text>
 					<HStack spacing={1}>

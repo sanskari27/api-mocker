@@ -6,6 +6,7 @@ import { useEnvironments, usePopupState, useRuleManagement } from './hooks';
 
 const App: React.FC = () => {
 	const [currentPage, setCurrentPage] = useState<'home' | 'settings' | 'environments'>('home');
+	const [searchTerm, setSearchTerm] = useState('');
 
 	const { popupState, setPopupState, loading, toggleMocking } = usePopupState();
 
@@ -91,6 +92,8 @@ const App: React.FC = () => {
 						onToggleMocking={toggleMocking}
 						onAddNewRule={addNewRule}
 						onOpenPage={setCurrentPage}
+						searchTerm={searchTerm}
+						onSearchChange={setSearchTerm}
 					/>
 
 					{/* Rules Section */}
@@ -100,6 +103,7 @@ const App: React.FC = () => {
 						onDeleteRule={deleteRule}
 						onCloneRule={cloneRule}
 						onUpdateRuleHeaders={updateRuleHeaders}
+						searchTerm={searchTerm}
 					/>
 				</VStack>
 			</Box>

@@ -24,7 +24,8 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import { MockRule } from '../../types';
-import { getResolvedTheme, getThemeClasses, useTheme } from '../contexts/ThemeContext';
+import { getThemeClasses, useTheme } from '../contexts/ThemeContext';
+import { getBorderThemeProps, getInputThemeProps, getTextThemeProps } from '../utils/themeUtils';
 import Editor from './Editor';
 import HeadersEditor from './HeadersEditor';
 
@@ -47,14 +48,17 @@ const RuleCard: React.FC<RuleCardProps> = ({
 }) => {
 	const { theme } = useTheme();
 	const themeClasses = getThemeClasses(theme);
+	const inputThemeProps = getInputThemeProps(theme);
+	const borderThemeProps = getBorderThemeProps(theme);
+	const textThemeProps = getTextThemeProps(theme);
 
 	return (
 		<AccordionItem
-			border='1px'
-			borderColor='gray.200'
+			border={`1px`}
+			{...borderThemeProps}
 			mb={2}
 			borderRadius='md'
-			className={themeClasses.bgCard}
+			className={`${themeClasses.bgCard}`}
 		>
 			<AccordionButton className={`${themeClasses.hover} p-3`}>
 				<Box flex='1' textAlign='left'>
@@ -102,6 +106,8 @@ const RuleCard: React.FC<RuleCardProps> = ({
 							onChange={(e) => onUpdate(rule.id, { url: e.target.value })}
 							placeholder='e.g., /api/user or *user*'
 							className='font-mono text-xs'
+							border={`1px`}
+							{...inputThemeProps}
 						/>
 					</FormControl>
 
@@ -114,6 +120,8 @@ const RuleCard: React.FC<RuleCardProps> = ({
 							<Select
 								size='sm'
 								rounded={'md'}
+								border={`1px`}
+								{...inputThemeProps}
 								value={rule.method}
 								onChange={(e) =>
 									onUpdate(rule.id, {
@@ -137,6 +145,8 @@ const RuleCard: React.FC<RuleCardProps> = ({
 								size='sm'
 								type='number'
 								rounded={'md'}
+								border={`1px`}
+								{...inputThemeProps}
 								value={rule.responseCode}
 								onChange={(e) =>
 									onUpdate(rule.id, {
@@ -155,6 +165,8 @@ const RuleCard: React.FC<RuleCardProps> = ({
 								size='sm'
 								type='number'
 								rounded={'md'}
+								border={`1px`}
+								{...inputThemeProps}
 								value={rule.delay || 0}
 								onChange={(e) =>
 									onUpdate(rule.id, {
@@ -171,12 +183,8 @@ const RuleCard: React.FC<RuleCardProps> = ({
 					<FormControl>
 						<Tabs defaultIndex={0} size='sm'>
 							<TabList>
-								<Tab color={getResolvedTheme(theme) === 'dark' ? 'gray.100' : 'gray.900'}>
-									Response Body
-								</Tab>
-								<Tab color={getResolvedTheme(theme) === 'dark' ? 'gray.100' : 'gray.900'}>
-									Headers
-								</Tab>
+								<Tab {...textThemeProps}>Response Body</Tab>
+								<Tab {...textThemeProps}>Headers</Tab>
 							</TabList>
 							<TabPanels>
 								<TabPanel px={0} py={2}>

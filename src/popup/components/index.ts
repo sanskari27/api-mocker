@@ -6,4 +6,5 @@ export { default as EnvironmentPage } from './EnvironmentPage';
 export { default as HeadersEditor } from './HeadersEditor';
 export { default as RuleCard } from './RuleCard';
 export { default as RulesList } from './RulesList';
+export { default as SearchComponent } from './SearchComponent';
 export { default as SettingsPage } from './SettingsPage';
