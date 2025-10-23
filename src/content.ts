@@ -7,6 +7,7 @@ class ApiMockerContentScript {
 	constructor() {
 		this.initializeListeners();
 		this.initializeState();
+		console.log('[API Mocker] Content script initialized');
 	}
 
 	private initializeListeners(): void {
@@ -41,9 +42,8 @@ class ApiMockerContentScript {
 		try {
 			// Get initial state from background script
 			const response = await chrome.runtime.sendMessage({
-				type: 'GET_TAB_STATE',
+				type: 'GET_MOCKED_RULES',
 			});
-
 			if (response.success) {
 				this.enabled = response.data.enabled;
 				this.rules = response.data.rules;

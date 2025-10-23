@@ -63,6 +63,10 @@ class BackgroundService {
 					await this.getTabState(tabId!, sendResponse);
 					break;
 
+				case 'GET_MOCKED_RULES':
+					await this.getMockedRules(tabId!, sendResponse);
+					break;
+
 				case 'SET_TAB_STATE':
 					await this.setTabState(tabId!, message.enabled!, sendResponse);
 					break;
@@ -168,6 +172,23 @@ class BackgroundService {
 		sendResponse({ success: true, data: responseData });
 	}
 
+	private async getMockedRules(
+		tabId: number,
+		sendResponse: (response: any) => void
+	): Promise<void> {
+		const data = await this.getStorageData();
+		const tabState = data.tabStates[tabId.toString()] || { enabled: false };
+		const mockedRules =
+			data.environments.find((environment: Environment) => environment.enabled)?.rules ?? [];
+		sendResponse({
+			success: true,
+			data: {
+				enabled: tabState.enabled,
+				rules: mockedRules,
+			},
+		});
+	}
+
 	private async setTabState(
 		tabId: number,
 		enabled: boolean,
@@ -218,9 +239,6 @@ class BackgroundService {
 		data.environments = data.environments.map((env) =>
 			env.id === activeEnv?.id ? { ...env, rules: rules } : env
 		);
-
-		console.log('setRules data.environments', data.environments);
-		console.log('setRules activeEnv', activeEnv?.id);
 
 		await this.saveStorageData(data);
 		await this.notifyTabsRulesUpdated(rules);
@@ -333,27 +351,7 @@ class BackgroundService {
 			await this.saveStorageData(data);
 
 			// Notify all tabs with mocking enabled about the updated rule
-			try {
-				const tabs = await chrome.tabs.query({});
-				for (const tab of tabs) {
-					if (tab.id) {
-						const tabState = data.tabStates[tab.id.toString()];
-						if (tabState && tabState.enabled) {
-							try {
-								await chrome.tabs.sendMessage(tab.id, {
-									type: 'RULES_UPDATED',
-									rules: rules,
-									enabled: true,
-								});
-							} catch (error) {
-								// Tab might be closed or not ready, ignore
-							}
-						}
-					}
-				}
-			} catch (error) {
-				// Silently handle message sending errors
-			}
+			await this.notifyTabsRulesUpdated(rules);
 
 			sendResponse({ success: true, requestCount: rules[ruleIndex].requestCount });
 		} else {

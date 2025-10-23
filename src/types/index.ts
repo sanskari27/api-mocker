@@ -21,6 +21,7 @@ export interface StorageData {
 export interface MessageData {
 	type:
 		| 'GET_TAB_STATE'
+		| 'GET_MOCKED_RULES'
 		| 'SET_TAB_STATE'
 		| 'GET_RULES'
 		| 'SET_RULES'
