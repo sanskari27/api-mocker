@@ -6,11 +6,10 @@ import { useEnvironments, usePopupState, useRuleManagement } from './hooks';
 const App: React.FC = () => {
 	const [currentPage, setCurrentPage] = useState<'home' | 'settings' | 'environments'>('home');
 
-	const { popupState, setPopupState, loading, toggleMocking, saveRules, saveEnvironments } =
-		usePopupState();
+	const { popupState, setPopupState, loading, toggleMocking } = usePopupState();
 
 	const { addNewRule, updateRule, deleteRule, cloneRule, updateRuleHeaders, getRuleCount } =
-		useRuleManagement({ popupState, setPopupState, saveRules });
+		useRuleManagement({ popupState, setPopupState });
 
 	const {
 		getEnvironmentCount,
@@ -23,7 +22,7 @@ const App: React.FC = () => {
 		exportSingleEnvironment,
 		importEnvironments,
 		importSingleEnvironment,
-	} = useEnvironments({ popupState, setPopupState, saveEnvironments });
+	} = useEnvironments({ popupState, setPopupState });
 
 	if (loading) {
 		return (

@@ -6,14 +6,10 @@ import { PopupState } from './usePopupState';
 interface UseEnvironmentsProps {
 	popupState: PopupState;
 	setPopupState: React.Dispatch<React.SetStateAction<PopupState>>;
-	saveEnvironments: (environments: Environment[]) => Promise<void>;
+	saveEnvironments?: (environments: Environment[]) => Promise<void>;
 }
 
-export const useEnvironments = ({
-	popupState,
-	setPopupState,
-	saveEnvironments,
-}: UseEnvironmentsProps) => {
+export const useEnvironments = ({ popupState, setPopupState }: UseEnvironmentsProps) => {
 	const { environments } = popupState;
 	const toast = useToast();
 
@@ -29,7 +25,6 @@ export const useEnvironments = ({
 		const currentEnvironments = Array.isArray(environments) ? environments : [];
 		const updatedEnvironments = [...currentEnvironments, newEnvironment];
 		setPopupState((prev) => ({ ...prev, environments: updatedEnvironments }));
-		saveEnvironments(updatedEnvironments);
 	};
 
 	const updateEnvironment = (envId: string, updates: Partial<Environment>): void => {
@@ -39,7 +34,6 @@ export const useEnvironments = ({
 			env.id === envId ? { ...env, ...updates } : env
 		);
 		setPopupState((prev) => ({ ...prev, environments: updatedEnvironments }));
-		saveEnvironments(updatedEnvironments);
 	};
 
 	const updateEnvironmentName = (envId: string, name: string): void => {
@@ -75,7 +69,6 @@ export const useEnvironments = ({
 		updatedEnvironments = enableDefaultEnvironment(updatedEnvironments);
 
 		setPopupState((prev) => ({ ...prev, environments: updatedEnvironments }));
-		saveEnvironments(updatedEnvironments);
 	};
 
 	const deleteEnvironment = (envId: string): void => {
@@ -97,7 +90,6 @@ export const useEnvironments = ({
 		let updatedEnvironments = currentEnvironments.filter((env) => env.id !== envId);
 		updatedEnvironments = enableDefaultEnvironment(updatedEnvironments);
 		setPopupState((prev) => ({ ...prev, environments: updatedEnvironments }));
-		saveEnvironments(updatedEnvironments);
 		toast({
 			title: 'Environment deleted',
 			description: `"${environment.name}" has been deleted`,
@@ -117,7 +109,6 @@ export const useEnvironments = ({
 			},
 		];
 		setPopupState((prev) => ({ ...prev, environments }));
-		saveEnvironments(environments);
 	};
 
 	const enableDefaultEnvironment = (environments: Environment[]): Environment[] => {
@@ -249,7 +240,6 @@ export const useEnvironments = ({
 					updatedEnvironments = enableDefaultEnvironment(updatedEnvironments);
 
 					setPopupState((prev) => ({ ...prev, environments: updatedEnvironments }));
-					saveEnvironments(updatedEnvironments);
 
 					toast({
 						title: 'Environments imported successfully',
@@ -331,7 +321,6 @@ export const useEnvironments = ({
 					);
 
 					setPopupState((prev) => ({ ...prev, environments: updatedEnvironments }));
-					saveEnvironments(updatedEnvironments);
 				} catch (error) {
 					toast({
 						title: 'Import failed',

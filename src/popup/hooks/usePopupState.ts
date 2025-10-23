@@ -22,6 +22,14 @@ export const usePopupState = () => {
 		initializePopup();
 	}, []);
 
+	useEffect(() => {
+		saveRules(popupState.rules);
+	}, [popupState.rules]);
+
+	useEffect(() => {
+		saveEnvironments(popupState.environments);
+	}, [popupState.environments]);
+
 	const initializePopup = async (): Promise<void> => {
 		try {
 			// Get current tab
