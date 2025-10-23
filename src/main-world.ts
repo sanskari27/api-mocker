@@ -9,6 +9,7 @@ interface MockRule {
 	responseBody: string;
 	requestCount: number;
 	enabled: boolean;
+	delay: number;
 }
 
 class ApiMockerMainWorld {
@@ -64,8 +65,11 @@ class ApiMockerMainWorld {
 							'*'
 						);
 
-						// Add a small delay to simulate network latency
-						await new Promise((resolve) => setTimeout(resolve, 1000));
+						// Add delay to simulate network latency
+						const delay = matchingRule.delay || 0;
+						if (delay > 0) {
+							await new Promise((resolve) => setTimeout(resolve, delay));
+						}
 
 						// Create proper status text based on response code
 						const getStatusText = (code: number): string => {
@@ -182,6 +186,9 @@ class ApiMockerMainWorld {
 								this.onreadystatechange.call(this, new Event('readystatechange'));
 							}
 
+							// Use the delay from the matching rule, with a minimum of 5ms for proper XHR simulation
+							const delay = Math.max(matchingRule.delay || 0, 5);
+
 							setTimeout(() => {
 								// State 2: HEADERS_RECEIVED
 								Object.defineProperty(this, 'readyState', {
@@ -271,7 +278,7 @@ class ApiMockerMainWorld {
 										}
 									}, 5);
 								}, 5);
-							}, 5);
+							}, delay);
 						};
 
 						// Start the simulation after a short delay

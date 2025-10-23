@@ -138,20 +138,19 @@ const EnvironmentPage: React.FC<EnvironmentPageProps> = ({
 												colorScheme='purple'
 											/>
 										</Tooltip>
-										{env.id !== 'default' && (
-											<Tooltip label='Delete Environment' placement='bottom'>
-												<IconButton
-													aria-label='Delete Environment'
-													icon={<DeleteIcon />}
-													onClick={() => handleDeleteClick(env.id, env.name)}
-													size='sm'
-													variant='ghost'
-													colorScheme='red'
-													color='red.500'
-													_hover={{ bg: 'red.50' }}
-												/>
-											</Tooltip>
-										)}
+										<Tooltip label='Delete Environment' placement='bottom'>
+											<IconButton
+												aria-label='Delete Environment'
+												icon={<DeleteIcon />}
+												onClick={() => handleDeleteClick(env.id, env.name)}
+												size='sm'
+												disabled={env.id === 'default'}
+												variant='ghost'
+												colorScheme='red'
+												color='red.500'
+												_hover={{ bg: 'red.50' }}
+											/>
+										</Tooltip>
 									</HStack>
 								</HStack>
 							</Box>

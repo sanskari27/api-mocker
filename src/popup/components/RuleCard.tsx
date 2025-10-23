@@ -24,8 +24,8 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import { MockRule } from '../../types';
+import Editor from './Editor';
 import HeadersEditor from './HeadersEditor';
-import JsonEditor from './JsonEditor';
 
 interface RuleCardProps {
 	rule: MockRule;
@@ -94,7 +94,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
 						/>
 					</FormControl>
 
-					{/* Method and Response Code */}
+					{/* Method, Response Code, and Delay */}
 					<HStack spacing={2}>
 						<FormControl>
 							<FormLabel fontSize='sm' fontWeight='semibold'>
@@ -134,6 +134,23 @@ const RuleCard: React.FC<RuleCardProps> = ({
 								max={599}
 							/>
 						</FormControl>
+						<FormControl>
+							<FormLabel fontSize='sm' fontWeight='semibold'>
+								Delay (ms)
+							</FormLabel>
+							<Input
+								size='sm'
+								type='number'
+								value={rule.delay || 0}
+								onChange={(e) =>
+									onUpdate(rule.id, {
+										delay: parseInt(e.target.value) || 0,
+									})
+								}
+								min={0}
+								placeholder='0'
+							/>
+						</FormControl>
 					</HStack>
 
 					{/* Response Headers and Body Tabs */}
@@ -145,7 +162,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
 							</TabList>
 							<TabPanels>
 								<TabPanel px={0} py={2}>
-									<JsonEditor
+									<Editor
 										onChange={(value) => onUpdate(rule.id, { responseBody: value })}
 										value={rule.responseBody}
 										height='200px'

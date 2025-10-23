@@ -22,6 +22,7 @@ export const useRuleManagement = ({ popupState, setPopupState }: UseRuleManageme
 			responseBody: '{}',
 			requestCount: 0,
 			enabled: true,
+			delay: 0,
 		};
 
 		// Ensure rules is an array before spreading

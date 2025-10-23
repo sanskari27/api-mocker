@@ -2,14 +2,14 @@ import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
 import * as monaco from 'monaco-editor';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-interface JsonEditorProps {
+interface EditorProps {
 	value: string;
 	onChange: (value: string) => void;
 	placeholder?: string;
 	height?: string;
 }
 
-const JsonEditor: React.FC<JsonEditorProps> = ({
+const Editor: React.FC<EditorProps> = ({
 	value,
 	onChange,
 	placeholder = 'Enter JSON...',
@@ -311,4 +311,4 @@ const JsonEditor: React.FC<JsonEditorProps> = ({
 	);
 };
 
-export default JsonEditor;
+export default Editor;

@@ -7,6 +7,7 @@ export interface MockRule {
 	responseBody: string;
 	requestCount: number;
 	enabled: boolean;
+	delay: number;
 }
 
 export interface TabMockState {

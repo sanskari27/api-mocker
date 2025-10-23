@@ -195,7 +195,7 @@ class BackgroundService {
 		sendResponse: (response: any) => void
 	): Promise<void> {
 		const data = await this.getStorageData();
-		const activeEnvironment = await this.getActiveEnvironment();
+		const activeEnvironment = this.getActiveEnvironment(data);
 		const tabIdStr = tabId.toString();
 
 		if (!data.tabStates[tabIdStr]) {
@@ -223,7 +223,8 @@ class BackgroundService {
 	}
 
 	private async getRules(tabId: number, sendResponse: (response: any) => void): Promise<void> {
-		const activeEnvironment = await this.getActiveEnvironment();
+		const data = await this.getStorageData();
+		const activeEnvironment = await this.getActiveEnvironment(data);
 		sendResponse({ success: true, data: activeEnvironment?.rules ?? [] });
 	}
 
@@ -235,7 +236,7 @@ class BackgroundService {
 		const data = await this.getStorageData();
 
 		// Update active environment
-		const activeEnv = await this.getActiveEnvironment();
+		const activeEnv = this.getActiveEnvironment(data);
 		data.environments = data.environments.map((env) =>
 			env.id === activeEnv?.id ? { ...env, rules: rules } : env
 		);
@@ -245,8 +246,7 @@ class BackgroundService {
 		sendResponse({ success: true });
 	}
 
-	private async getActiveEnvironment(): Promise<Environment | undefined> {
-		const data = await this.getStorageData();
+	private getActiveEnvironment(data: StorageData): Environment | undefined {
 		return data.environments.find((environment: Environment) => environment.enabled);
 	}
 
@@ -264,13 +264,13 @@ class BackgroundService {
 		sendResponse: (response: any) => void
 	): Promise<void> {
 		const data = await this.getStorageData();
-		const prevActiveEnvironment = await this.getActiveEnvironment();
+		const prevActiveEnvironment = this.getActiveEnvironment(data);
 
 		// Update global rules
 		data.environments = environments;
 		await this.saveStorageData(data);
 
-		const activeEnvironment = await this.getActiveEnvironment();
+		const activeEnvironment = this.getActiveEnvironment(data);
 		const environmentStateUpdated = activeEnvironment?.id !== prevActiveEnvironment?.id;
 
 		if (environmentStateUpdated) {
@@ -306,7 +306,7 @@ class BackgroundService {
 
 	private async toggleMocking(tabId: number, sendResponse: (response: any) => void): Promise<void> {
 		const data = await this.getStorageData();
-		const activeEnvironment = await this.getActiveEnvironment();
+		const activeEnvironment = this.getActiveEnvironment(data);
 		const tabIdStr = tabId.toString();
 
 		if (!data.tabStates[tabIdStr]) {
@@ -341,7 +341,7 @@ class BackgroundService {
 		sendResponse: (response: any) => void
 	): Promise<void> {
 		const data = await this.getStorageData();
-		const activeEnvironment = await this.getActiveEnvironment();
+		const activeEnvironment = this.getActiveEnvironment(data);
 		const rules = activeEnvironment?.rules ?? [];
 
 		// Find the rule and increment its request count
