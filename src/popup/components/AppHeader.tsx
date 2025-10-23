@@ -1,9 +1,8 @@
-import { AddIcon, InfoIcon } from '@chakra-ui/icons';
+import { AddIcon, SettingsIcon } from '@chakra-ui/icons';
 import { Badge, Box, HStack, IconButton, Image, Text, Tooltip } from '@chakra-ui/react';
 import React from 'react';
 import { FaPause, FaPlay } from 'react-icons/fa6';
-import { FiDownload, FiUpload } from 'react-icons/fi';
-import { IoIosNuclear } from 'react-icons/io';
+import { SiDotenv } from 'react-icons/si';
 import { API_DISABLED, API_ENABLED } from '../../assets';
 
 interface AppHeaderProps {
@@ -11,10 +10,7 @@ interface AppHeaderProps {
 	ruleCount: number;
 	onToggleMocking: () => void;
 	onAddNewRule: () => void;
-	onAddExampleRule: () => void;
-	onClearAllRules: () => void;
-	onExportRules: () => void;
-	onImportRules: () => void;
+	onOpenPage: (page: 'settings' | 'environments') => void;
 }
 
 const AppHeader: React.FC<AppHeaderProps> = ({
@@ -22,10 +18,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 	ruleCount,
 	onToggleMocking,
 	onAddNewRule,
-	onAddExampleRule,
-	onClearAllRules,
-	onExportRules,
-	onImportRules,
+	onOpenPage,
 }) => {
 	return (
 		<Box className='bg-white p-3 border-b border-b-gray-700'>
@@ -39,34 +32,24 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 				</HStack>
 
 				<HStack spacing={2}>
-					<Tooltip label='Import Rules' placement='bottom'>
+					<Tooltip label='Settings' placement='bottom'>
 						<IconButton
-							aria-label='Import Rules'
-							icon={<FiDownload />}
-							onClick={onImportRules}
+							aria-label='Settings'
+							icon={<SettingsIcon />}
+							onClick={() => onOpenPage('settings')}
+							size='sm'
+							variant='outline'
+							colorScheme='gray'
+						/>
+					</Tooltip>
+					<Tooltip label='Environments' placement='bottom'>
+						<IconButton
+							aria-label='Environments'
+							icon={<SiDotenv />}
+							onClick={() => onOpenPage('environments')}
 							size='sm'
 							variant='outline'
 							colorScheme='purple'
-						/>
-					</Tooltip>
-					<Tooltip label='Export Rules' placement='bottom'>
-						<IconButton
-							aria-label='Export Rules'
-							icon={<FiUpload />}
-							onClick={onExportRules}
-							size='sm'
-							variant='outline'
-							colorScheme='purple'
-						/>
-					</Tooltip>
-					<Tooltip label='Add Example Rule' placement='bottom'>
-						<IconButton
-							aria-label='Add Example Rule'
-							icon={<InfoIcon />}
-							onClick={onAddExampleRule}
-							size='sm'
-							variant='outline'
-							colorScheme='blue'
 						/>
 					</Tooltip>
 					<Tooltip label='Add New Rule' placement='bottom'>
@@ -78,18 +61,6 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 							colorScheme='blue'
 						/>
 					</Tooltip>
-					{ruleCount > 0 && (
-						<Tooltip label='Clear All Rules' placement='bottom'>
-							<IconButton
-								aria-label='Clear All Rules'
-								icon={<IoIosNuclear />}
-								onClick={onClearAllRules}
-								size='sm'
-								variant='outline'
-								colorScheme='orange'
-							/>
-						</Tooltip>
-					)}
 					<Tooltip label={enabled ? 'Pause Mocking' : 'Start Mocking'} placement='bottom'>
 						<IconButton
 							aria-label={enabled ? 'Pause Mocking' : 'Start Mocking'}

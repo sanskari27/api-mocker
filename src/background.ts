@@ -1,4 +1,4 @@
-import { MessageData, MockRule, StorageData } from './types';
+import { Environment, MessageData, MockRule, StorageData } from './types';
 
 class BackgroundService {
 	private storageKey = 'apiMockerData';
@@ -38,6 +38,13 @@ class BackgroundService {
 			const initialData: StorageData = {
 				globalRules: [],
 				tabStates: {},
+				environments: [
+					{
+						id: 'default',
+						name: 'Default',
+						enabled: true,
+					},
+				],
 			};
 			await chrome.storage.local.set({ [this.storageKey]: initialData });
 		}
@@ -68,6 +75,14 @@ class BackgroundService {
 					await this.setRules(tabId!, message.rules!, sendResponse);
 					break;
 
+				case 'GET_ENVIRONMENTS':
+					await this.getEnvironments(tabId!, sendResponse);
+					break;
+
+				case 'SET_ENVIRONMENTS':
+					await this.setEnvironments(tabId!, message.environments!, sendResponse);
+					break;
+
 				case 'TOGGLE_MOCKING':
 					await this.toggleMocking(tabId!, sendResponse);
 					break;
@@ -92,13 +107,18 @@ class BackgroundService {
 
 	private async getStorageData(): Promise<StorageData> {
 		const result = await chrome.storage.local.get(this.storageKey);
-		const data = result[this.storageKey] || { globalRules: [], tabStates: {} };
+		const data = result[this.storageKey] || { globalRules: [], tabStates: {}, environments: [] };
 
 		// Initialize requestCount and enabled for existing rules that don't have them
-		data.globalRules = data.globalRules.map((rule: MockRule) => ({
+		data.globalRules = (data.globalRules ?? []).map((rule: MockRule) => ({
 			...rule,
 			requestCount: rule.requestCount || 0,
 			enabled: rule.enabled !== false, // Default to true for backward compatibility
+		}));
+
+		data.environments = (data.environments ?? []).map((environment: Environment) => ({
+			...environment,
+			enabled: environment.enabled !== false, // Default to true for backward compatibility
 		}));
 
 		return data;
@@ -146,6 +166,7 @@ class BackgroundService {
 		const responseData = {
 			enabled: tabState.enabled,
 			rules: data.globalRules,
+			environments: data.environments,
 		};
 		sendResponse({ success: true, data: responseData });
 	}
@@ -209,6 +230,51 @@ class BackgroundService {
 							await chrome.tabs.sendMessage(tab.id, {
 								type: 'RULES_UPDATED',
 								rules: rules,
+								enabled: true,
+							});
+						} catch (error) {
+							// Tab might be closed or not ready, ignore
+						}
+					}
+				}
+			}
+		} catch (error) {
+			// Silently handle message sending errors
+		}
+
+		sendResponse({ success: true });
+	}
+
+	private async getEnvironments(
+		tabId: number,
+		sendResponse: (response: any) => void
+	): Promise<void> {
+		const data = await this.getStorageData();
+		sendResponse({ success: true, data: data.environments });
+	}
+
+	private async setEnvironments(
+		tabId: number,
+		environments: Environment[],
+		sendResponse: (response: any) => void
+	): Promise<void> {
+		const data = await this.getStorageData();
+
+		// Update global rules
+		data.environments = environments;
+		await this.saveStorageData(data);
+
+		// Notify all tabs with mocking enabled about rule changes
+		try {
+			const tabs = await chrome.tabs.query({});
+			for (const tab of tabs) {
+				if (tab.id) {
+					const tabState = data.tabStates[tab.id.toString()];
+					if (tabState && tabState.enabled) {
+						try {
+							await chrome.tabs.sendMessage(tab.id, {
+								type: 'ENVIRONMENTS_UPDATED',
+								environments: environments,
 								enabled: true,
 							});
 						} catch (error) {

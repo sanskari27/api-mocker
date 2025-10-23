@@ -1,14 +1,19 @@
 import { useToast } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
-import { MockRule } from '../../types';
+import { Environment, MockRule } from '../../types';
 
-interface PopupState {
+export interface PopupState {
 	enabled: boolean;
 	rules: MockRule[];
+	environments: Environment[];
 }
 
 export const usePopupState = () => {
-	const [popupState, setPopupState] = useState<PopupState>({ enabled: false, rules: [] });
+	const [popupState, setPopupState] = useState<PopupState>({
+		enabled: false,
+		rules: [],
+		environments: [],
+	});
 	const [loading, setLoading] = useState<boolean>(true);
 	const [currentTabId, setCurrentTabId] = useState<number | null>(null);
 	const toast = useToast();
@@ -40,6 +45,7 @@ export const usePopupState = () => {
 				const safeState = {
 					enabled: state.enabled || false,
 					rules: Array.isArray(state.rules) ? state.rules : [],
+					environments: Array.isArray(state.environments) ? state.environments : [],
 				};
 				setPopupState(safeState);
 			}
@@ -106,6 +112,30 @@ export const usePopupState = () => {
 		}
 	};
 
+	const saveEnvironments = async (environments: Environment[]): Promise<void> => {
+		if (!currentTabId) return;
+
+		try {
+			const response = await chrome.runtime.sendMessage({
+				type: 'SET_ENVIRONMENTS',
+				tabId: currentTabId,
+				environments: environments,
+			});
+
+			if (!response.success) {
+				throw new Error('Failed to save environments');
+			}
+		} catch (err) {
+			toast({
+				title: 'Error saving environments',
+				description: err instanceof Error ? err.message : 'Unknown error',
+				status: 'error',
+				duration: 3000,
+				isClosable: true,
+			});
+		}
+	};
+
 	return {
 		popupState,
 		setPopupState,
@@ -113,6 +143,6 @@ export const usePopupState = () => {
 		currentTabId,
 		toggleMocking,
 		saveRules,
-		toast,
+		saveEnvironments,
 	};
 };

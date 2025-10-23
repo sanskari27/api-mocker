@@ -7,7 +7,7 @@ const EmptyState: React.FC = () => {
 			<AlertIcon />
 			<Box>
 				<AlertDescription>
-					No rules configured. Click "Add Rule" or "Add Example" to get started.
+					No rules configured. Click "Add Rule" to get started.
 				</AlertDescription>
 			</Box>
 		</Alert>

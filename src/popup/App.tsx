@@ -1,10 +1,13 @@
 import { Box, Text, VStack } from '@chakra-ui/react';
-import React from 'react';
-import { AppHeader, RulesList } from './components';
-import { usePopupState, useRuleManagement } from './hooks';
+import React, { useState } from 'react';
+import { AppHeader, EnvironmentPage, RulesList, SettingsPage } from './components';
+import { useEnvironments, usePopupState, useRuleManagement } from './hooks';
 
 const App: React.FC = () => {
-	const { popupState, setPopupState, loading, toggleMocking, saveRules } = usePopupState();
+	const [currentPage, setCurrentPage] = useState<'home' | 'settings' | 'environments'>('home');
+
+	const { popupState, setPopupState, loading, toggleMocking, saveRules, saveEnvironments } =
+		usePopupState();
 
 	const {
 		addNewRule,
@@ -12,12 +15,19 @@ const App: React.FC = () => {
 		deleteRule,
 		cloneRule,
 		updateRuleHeaders,
-		addExampleRule,
 		getRuleCount,
 		clearAllRules,
 		exportRules,
 		importRules,
 	} = useRuleManagement({ popupState, setPopupState, saveRules });
+
+	const {
+		onAddEnvironment,
+		updateEnvironment,
+		onUpdateEnvironment,
+		onDeleteEnvironment,
+		onToggleEnvironmentStatus,
+	} = useEnvironments({ popupState, setPopupState, saveEnvironments });
 
 	if (loading) {
 		return (
@@ -27,6 +37,31 @@ const App: React.FC = () => {
 		);
 	}
 
+	// Show settings page
+	if (currentPage === 'settings') {
+		return (
+			<SettingsPage
+				onClose={() => setCurrentPage('home')}
+				onExportRules={exportRules}
+				onImportRules={importRules}
+				onClearAllRules={clearAllRules}
+				ruleCount={getRuleCount()}
+			/>
+		);
+	} else if (currentPage === 'environments') {
+		return (
+			<EnvironmentPage
+				environments={popupState.environments}
+				onEnvironmentStatusUpdate={onToggleEnvironmentStatus}
+				onAddEnvironment={onAddEnvironment}
+				onDeleteEnvironment={onDeleteEnvironment}
+				onUpdateEnvironment={onUpdateEnvironment}
+				onClose={() => setCurrentPage('home')}
+			/>
+		);
+	}
+
+	// Show home page
 	return (
 		<Box className='w-full max-h-full bg-gray-50 overflow-auto'>
 			<VStack spacing={2} align='stretch'>
@@ -36,10 +71,7 @@ const App: React.FC = () => {
 					ruleCount={getRuleCount()}
 					onToggleMocking={toggleMocking}
 					onAddNewRule={addNewRule}
-					onAddExampleRule={addExampleRule}
-					onClearAllRules={clearAllRules}
-					onExportRules={exportRules}
-					onImportRules={importRules}
+					onOpenPage={setCurrentPage}
 				/>
 
 				{/* Rules Section */}

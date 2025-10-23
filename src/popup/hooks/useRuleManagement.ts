@@ -1,9 +1,10 @@
 import { useToast } from '@chakra-ui/react';
 import { MockRule } from '../../types';
+import { PopupState } from './usePopupState';
 
 interface UseRuleManagementProps {
-	popupState: { enabled: boolean; rules: MockRule[] };
-	setPopupState: React.Dispatch<React.SetStateAction<{ enabled: boolean; rules: MockRule[] }>>;
+	popupState: PopupState;
+	setPopupState: React.Dispatch<React.SetStateAction<PopupState>>;
 	saveRules: (rules: MockRule[]) => Promise<void>;
 }
 
@@ -105,29 +106,6 @@ export const useRuleManagement = ({
 
 	const updateRuleHeaders = (ruleId: string, headers: Record<string, string>): void => {
 		updateRule(ruleId, { responseHeaders: headers });
-	};
-
-	const addExampleRule = (): void => {
-		const exampleRule: MockRule = {
-			id: generateRuleId(),
-			url: '/api/user',
-			method: 'GET',
-			responseCode: 200,
-			responseHeaders: { 'Content-Type': 'application/json' },
-			responseBody: JSON.stringify(
-				{ id: 123, name: 'Mock User', email: 'mock@example.com' },
-				null,
-				2
-			),
-			requestCount: 0,
-			enabled: true,
-		};
-
-		// Ensure rules is an array before spreading
-		const currentRules = Array.isArray(popupState.rules) ? popupState.rules : [];
-		const updatedRules = [...currentRules, exampleRule];
-		setPopupState((prev) => ({ ...prev, rules: updatedRules }));
-		saveRules(updatedRules);
 	};
 
 	const getRuleCount = (): number => {
@@ -260,7 +238,6 @@ export const useRuleManagement = ({
 		deleteRule,
 		cloneRule,
 		updateRuleHeaders,
-		addExampleRule,
 		getRuleCount,
 		clearAllRules,
 		exportRules,

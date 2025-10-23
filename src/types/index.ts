@@ -15,6 +15,7 @@ export interface TabMockState {
 
 export interface StorageData {
 	globalRules: MockRule[];
+	environments: Environment[];
 	tabStates: { [tabId: string]: TabMockState };
 }
 
@@ -24,12 +25,15 @@ export interface MessageData {
 		| 'SET_TAB_STATE'
 		| 'GET_RULES'
 		| 'SET_RULES'
+		| 'GET_ENVIRONMENTS'
+		| 'SET_ENVIRONMENTS'
 		| 'TOGGLE_MOCKING'
 		| 'INCREMENT_REQUEST_COUNT'
 		| 'TEST_ICON_UPDATE';
 	tabId?: number;
 	enabled?: boolean;
 	rules?: MockRule[];
+	environments?: Environment[];
 	data?: any;
 	ruleId?: string;
 }
@@ -39,4 +43,10 @@ export interface MockResponse {
 	status?: number;
 	statusText?: string;
 	headers?: { [key: string]: string };
+}
+
+export interface Environment {
+	id: string;
+	name: string;
+	enabled: boolean;
 }
