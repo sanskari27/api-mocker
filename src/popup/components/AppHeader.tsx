@@ -4,6 +4,7 @@ import React from 'react';
 import { FaPause, FaPlay } from 'react-icons/fa6';
 import { SiDotenv } from 'react-icons/si';
 import { API_DISABLED, API_ENABLED } from '../../assets';
+import { getThemeClasses, useTheme } from '../contexts/ThemeContext';
 
 interface AppHeaderProps {
 	enabled: boolean;
@@ -20,12 +21,15 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 	onAddNewRule,
 	onOpenPage,
 }) => {
+	const { theme } = useTheme();
+	const themeClasses = getThemeClasses(theme);
+
 	return (
-		<Box className='bg-white p-3 border-b border-b-gray-700'>
+		<Box className={`${themeClasses.bgHeader} p-3 border-b ${themeClasses.border}`}>
 			<HStack justify='space-between' align='center'>
 				<HStack spacing={3}>
 					<Image src={enabled ? API_ENABLED : API_DISABLED} alt='API Mocker' width={9} height={9} />
-					<Text className='font-bold text-lg text-gray-800'>API Mocker</Text>
+					<Text className={`font-bold text-lg ${themeClasses.text}`}>API Mocker</Text>
 					<Badge variant='outline' size='sm'>
 						{ruleCount} rules
 					</Badge>
@@ -39,7 +43,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({
 							onClick={() => onOpenPage('settings')}
 							size='sm'
 							variant='outline'
-							colorScheme='gray'
+							colorScheme='teal'
 						/>
 					</Tooltip>
 					<Tooltip label='Environments' placement='bottom'>

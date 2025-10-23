@@ -1,6 +1,7 @@
 import { Box, Button, HStack, Text, VStack } from '@chakra-ui/react';
 import * as monaco from 'monaco-editor';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { getThemeClasses, useTheme } from '../contexts/ThemeContext';
 
 interface EditorProps {
 	value: string;
@@ -20,6 +21,9 @@ const Editor: React.FC<EditorProps> = ({
 	const [isExpanded, setIsExpanded] = useState(false);
 	const editorRef = useRef<HTMLDivElement>(null);
 	const monacoEditorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+
+	const { theme: currentTheme } = useTheme();
+	const themeClasses = getThemeClasses(currentTheme);
 
 	// Enable/disable handleMouseWheel based on mouse click inside/outside editor
 	useEffect(() => {
@@ -258,6 +262,7 @@ const Editor: React.FC<EditorProps> = ({
 					</Text>
 					<HStack spacing={1}>
 						<Button
+							className={themeClasses.buttonSecondary}
 							size='xs'
 							variant='outline'
 							onClick={formatJson}
@@ -266,6 +271,7 @@ const Editor: React.FC<EditorProps> = ({
 							Format
 						</Button>
 						<Button
+							className={themeClasses.buttonSecondary}
 							size='xs'
 							variant='outline'
 							onClick={toggleExpanded}

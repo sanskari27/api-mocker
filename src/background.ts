@@ -100,6 +100,10 @@ class BackgroundService {
 					sendResponse({ success: true });
 					break;
 
+				case 'SET_THEME':
+					await this.setTheme(tabId!, message.theme!, sendResponse);
+					break;
+
 				default:
 					sendResponse({ error: 'Unknown message type' });
 			}
@@ -168,6 +172,7 @@ class BackgroundService {
 		const responseData = {
 			enabled: tabState.enabled,
 			environments: data.environments,
+			theme: tabState.theme || 'system',
 		};
 		sendResponse({ success: true, data: responseData });
 	}
@@ -356,6 +361,24 @@ class BackgroundService {
 			sendResponse({ success: true, requestCount: rules[ruleIndex].requestCount });
 		} else {
 			sendResponse({ success: false, error: 'Rule not found' });
+		}
+	}
+
+	private async setTheme(
+		tabId: number,
+		theme: 'light' | 'dark' | 'system',
+		sendResponse: (response: any) => void
+	): Promise<void> {
+		try {
+			const data = await this.getStorageData();
+			const tabState = data.tabStates[tabId.toString()] || { enabled: false };
+			tabState.theme = theme;
+			data.tabStates[tabId.toString()] = tabState;
+			await this.saveStorageData(data);
+
+			sendResponse({ success: true });
+		} catch (error) {
+			sendResponse({ success: false, error: 'Failed to save theme' });
 		}
 	}
 }

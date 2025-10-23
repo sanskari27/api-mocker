@@ -12,6 +12,7 @@ export interface MockRule {
 
 export interface TabMockState {
 	enabled: boolean;
+	theme?: 'light' | 'dark' | 'system';
 }
 
 export interface StorageData {
@@ -31,13 +32,15 @@ export interface MessageData {
 		| 'SET_ENVIRONMENTS'
 		| 'TOGGLE_MOCKING'
 		| 'INCREMENT_REQUEST_COUNT'
-		| 'TEST_ICON_UPDATE';
+		| 'TEST_ICON_UPDATE'
+		| 'SET_THEME';
 	tabId?: number;
 	enabled?: boolean;
 	rules?: MockRule[];
 	environments?: Environment[];
 	data?: any;
 	ruleId?: string;
+	theme?: 'light' | 'dark' | 'system';
 }
 
 export interface MockResponse {

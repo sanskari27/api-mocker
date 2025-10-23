@@ -1,11 +1,13 @@
 import { useToast } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { Environment, MockRule } from '../../types';
+import { Theme } from '../contexts/ThemeContext';
 
 export interface PopupState {
 	enabled: boolean;
 	rules: MockRule[];
 	environments: Environment[];
+	theme: Theme;
 }
 
 export const usePopupState = () => {
@@ -13,6 +15,7 @@ export const usePopupState = () => {
 		enabled: false,
 		rules: [],
 		environments: [],
+		theme: 'system',
 	});
 	const [loading, setLoading] = useState<boolean>(true);
 	const [currentTabId, setCurrentTabId] = useState<number | null>(null);
@@ -29,6 +32,10 @@ export const usePopupState = () => {
 	useEffect(() => {
 		saveEnvironments(popupState.environments);
 	}, [popupState.environments]);
+
+	useEffect(() => {
+		saveTheme(popupState.theme);
+	}, [popupState.theme]);
 
 	const initializePopup = async (): Promise<void> => {
 		try {
@@ -58,6 +65,7 @@ export const usePopupState = () => {
 					enabled: state.enabled || false,
 					rules: rules,
 					environments: environments,
+					theme: state.theme || 'system',
 				};
 				setPopupState(safeState);
 			}
@@ -153,6 +161,30 @@ export const usePopupState = () => {
 		}
 	};
 
+	const saveTheme = async (theme: 'light' | 'dark' | 'system'): Promise<void> => {
+		if (!currentTabId) return;
+
+		try {
+			const response = await chrome.runtime.sendMessage({
+				type: 'SET_THEME',
+				tabId: currentTabId,
+				theme: theme,
+			});
+
+			if (!response.success) {
+				throw new Error('Failed to save theme');
+			}
+		} catch (err) {
+			toast({
+				title: 'Error saving theme',
+				description: err instanceof Error ? err.message : 'Unknown error',
+				status: 'error',
+				duration: 3000,
+				isClosable: true,
+			});
+		}
+	};
+
 	return {
 		popupState,
 		setPopupState,
@@ -161,5 +193,6 @@ export const usePopupState = () => {
 		toggleMocking,
 		saveRules,
 		saveEnvironments,
+		saveTheme,
 	};
 };

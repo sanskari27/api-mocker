@@ -24,6 +24,7 @@ import {
 } from '@chakra-ui/react';
 import React from 'react';
 import { MockRule } from '../../types';
+import { getResolvedTheme, getThemeClasses, useTheme } from '../contexts/ThemeContext';
 import Editor from './Editor';
 import HeadersEditor from './HeadersEditor';
 
@@ -44,9 +45,18 @@ const RuleCard: React.FC<RuleCardProps> = ({
 	onClone,
 	onUpdateHeaders,
 }) => {
+	const { theme } = useTheme();
+	const themeClasses = getThemeClasses(theme);
+
 	return (
-		<AccordionItem border='1px' borderColor='gray.200' mb={2} borderRadius='md'>
-			<AccordionButton className='hover:bg-gray-50' p={3}>
+		<AccordionItem
+			border='1px'
+			borderColor='gray.200'
+			mb={2}
+			borderRadius='md'
+			className={themeClasses.bgCard}
+		>
+			<AccordionButton className={`${themeClasses.hover} p-3`}>
 				<Box flex='1' textAlign='left'>
 					<HStack>
 						<Badge size='sm' colorScheme='gray' variant='solid'>
@@ -58,7 +68,7 @@ const RuleCard: React.FC<RuleCardProps> = ({
 						<Badge size='sm' variant='outline'>
 							{rule.responseCode}
 						</Badge>
-						<Text fontSize='sm' className='font-mono font-semibold'>
+						<Text fontSize='sm' className={`font-mono font-semibold ${themeClasses.text}`}>
 							{rule.url || 'New Rule'}
 						</Text>
 					</HStack>
@@ -81,12 +91,13 @@ const RuleCard: React.FC<RuleCardProps> = ({
 			<AccordionPanel pb={2} pt={0}>
 				<VStack spacing={2} align='stretch'>
 					{/* URL Input */}
-					<FormControl>
+					<FormControl className={themeClasses.text} rounded={'md'}>
 						<FormLabel fontSize='sm' fontWeight='semibold'>
 							URL Pattern
 						</FormLabel>
 						<Input
 							size='sm'
+							rounded={'md'}
 							value={rule.url}
 							onChange={(e) => onUpdate(rule.id, { url: e.target.value })}
 							placeholder='e.g., /api/user or *user*'
@@ -96,12 +107,13 @@ const RuleCard: React.FC<RuleCardProps> = ({
 
 					{/* Method, Response Code, and Delay */}
 					<HStack spacing={2}>
-						<FormControl>
+						<FormControl className={themeClasses.text} rounded={'md'}>
 							<FormLabel fontSize='sm' fontWeight='semibold'>
 								Method
 							</FormLabel>
 							<Select
 								size='sm'
+								rounded={'md'}
 								value={rule.method}
 								onChange={(e) =>
 									onUpdate(rule.id, {
@@ -117,13 +129,14 @@ const RuleCard: React.FC<RuleCardProps> = ({
 								<option value='PATCH'>PATCH</option>
 							</Select>
 						</FormControl>
-						<FormControl>
+						<FormControl className={themeClasses.text} rounded={'md'}>
 							<FormLabel fontSize='sm' fontWeight='semibold'>
 								Status Code
 							</FormLabel>
 							<Input
 								size='sm'
 								type='number'
+								rounded={'md'}
 								value={rule.responseCode}
 								onChange={(e) =>
 									onUpdate(rule.id, {
@@ -134,13 +147,14 @@ const RuleCard: React.FC<RuleCardProps> = ({
 								max={599}
 							/>
 						</FormControl>
-						<FormControl>
+						<FormControl className={themeClasses.text} rounded={'md'}>
 							<FormLabel fontSize='sm' fontWeight='semibold'>
 								Delay (ms)
 							</FormLabel>
 							<Input
 								size='sm'
 								type='number'
+								rounded={'md'}
 								value={rule.delay || 0}
 								onChange={(e) =>
 									onUpdate(rule.id, {
@@ -157,8 +171,12 @@ const RuleCard: React.FC<RuleCardProps> = ({
 					<FormControl>
 						<Tabs defaultIndex={0} size='sm'>
 							<TabList>
-								<Tab>Response Body</Tab>
-								<Tab>Headers</Tab>
+								<Tab color={getResolvedTheme(theme) === 'dark' ? 'gray.100' : 'gray.900'}>
+									Response Body
+								</Tab>
+								<Tab color={getResolvedTheme(theme) === 'dark' ? 'gray.100' : 'gray.900'}>
+									Headers
+								</Tab>
 							</TabList>
 							<TabPanels>
 								<TabPanel px={0} py={2}>

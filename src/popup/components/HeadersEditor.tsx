@@ -1,6 +1,7 @@
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { HStack, IconButton, Input, Tooltip, VStack } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
+import { getResolvedTheme, getThemeClasses, useTheme } from '../contexts/ThemeContext';
 
 interface HeadersEditorProps {
 	headers: Record<string, string>;
@@ -8,6 +9,8 @@ interface HeadersEditorProps {
 }
 
 const HeadersEditor: React.FC<HeadersEditorProps> = ({ headers, onChange }) => {
+	const { theme } = useTheme();
+	const themeClasses = getThemeClasses(theme);
 	const [headerEntries, setHeaderEntries] = useState<Array<{ key: string; value: string }>>([]);
 
 	useEffect(() => {
@@ -56,15 +59,17 @@ const HeadersEditor: React.FC<HeadersEditorProps> = ({ headers, onChange }) => {
 						size='sm'
 						placeholder='Header name'
 						value={entry.key}
+						rounded={'md'}
 						onChange={(e) => updateEntry(index, 'key', e.target.value)}
-						className='text-xs'
+						className={`text-xs ${themeClasses.input}`}
 					/>
 					<Input
 						size='sm'
 						placeholder='Header value'
 						value={entry.value}
+						rounded={'md'}
 						onChange={(e) => updateEntry(index, 'value', e.target.value)}
-						className='text-xs'
+						className={`text-xs ${themeClasses.input}`}
 					/>
 					{headerEntries.length > 1 && (
 						<Tooltip label='Remove header' placement='top'>
@@ -84,7 +89,7 @@ const HeadersEditor: React.FC<HeadersEditorProps> = ({ headers, onChange }) => {
 				<IconButton
 					size='xs'
 					aria-label='Add Header'
-					icon={<AddIcon />}
+					icon={<AddIcon color={getResolvedTheme(theme) === 'dark' ? 'gray.200' : 'gray.800'} />}
 					onClick={addEntry}
 					variant='outline'
 					alignSelf='flex-start'

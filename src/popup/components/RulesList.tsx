@@ -1,9 +1,7 @@
 import { Accordion, Box } from '@chakra-ui/react';
 import React from 'react';
-import { MockRule } from '../../types';
 import EmptyState from './EmptyState';
 import RuleCard from './RuleCard';
-
 interface RulesListProps {
 	rules: MockRule[];
 	onUpdateRule: (ruleId: string, updates: Partial<MockRule>) => void;
@@ -28,8 +26,8 @@ const RulesList: React.FC<RulesListProps> = ({
 	}
 
 	return (
-		<Box className='bg-white mx-3'>
-			<Accordion allowMultiple>
+		<Box className='mx-3'>
+			<Accordion allowMultiple >
 				{rules.map((rule, index) => (
 					<RuleCard
 						key={rule.id}

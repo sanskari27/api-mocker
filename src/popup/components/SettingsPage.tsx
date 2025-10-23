@@ -1,7 +1,18 @@
 import { CloseIcon, SettingsIcon } from '@chakra-ui/icons';
-import { Box, Button, Divider, HStack, IconButton, Text, VStack } from '@chakra-ui/react';
+import {
+	Box,
+	Button,
+	Divider,
+	FormControl,
+	HStack,
+	IconButton,
+	Select,
+	Text,
+	VStack,
+} from '@chakra-ui/react';
 import React from 'react';
 import { FiDownload, FiTrash2, FiUpload } from 'react-icons/fi';
+import { getSystemTheme, getThemeClasses, useTheme } from '../contexts/ThemeContext';
 import DeleteWarningDialog, { useDeleteDialogState } from './DeleteWarningDialog';
 
 interface SettingsPageProps {
@@ -10,6 +21,8 @@ interface SettingsPageProps {
 	onImportEnvironments: () => void;
 	onClearAllEnvironments: () => void;
 	environmentCount: number;
+	theme: 'light' | 'dark' | 'system';
+	onThemeChange: (theme: 'light' | 'dark' | 'system') => void;
 }
 
 const SettingsPage: React.FC<SettingsPageProps> = ({
@@ -18,7 +31,12 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 	onImportEnvironments,
 	onClearAllEnvironments,
 	environmentCount,
+	theme,
+	onThemeChange,
 }) => {
+	const { theme: currentTheme } = useTheme();
+	const themeClasses = getThemeClasses(currentTheme);
+
 	const {
 		isOpen: isDeleteDialogOpen,
 		openDeleteDialog,
@@ -38,13 +56,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 		closeDeleteDialog();
 	};
 	return (
-		<Box className='w-full h-full bg-gray-50 text-gray-800'>
+		<Box className={`w-full h-full ${themeClasses.bg} ${themeClasses.text}`}>
 			{/* Header with close button */}
-			<Box className='bg-white p-4 border-b border-gray-200'>
+			<Box className={`${themeClasses.bgHeader} p-4 border-b ${themeClasses.border}`}>
 				<HStack justify='space-between' align='center'>
 					<HStack spacing={3}>
 						<SettingsIcon boxSize={6} color='gray.600' />
-						<Text className='font-bold text-xl text-gray-800'>Settings</Text>
+						<Text className={`font-bold text-xl ${themeClasses.text}`}>Settings</Text>
 					</HStack>
 					<IconButton
 						aria-label='Close Settings'
@@ -62,18 +80,58 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 			{/* Settings content */}
 			<Box className='p-4'>
 				<VStack spacing={4} align='stretch'>
+					{/* Appearance Section */}
+					<Box>
+						<Text className={`font-bold text-xl ${themeClasses.text} mb-2`}>Appearance</Text>
+						<Text className={`${themeClasses.textSecondary} text-sm mb-3`}>
+							Customize the look and feel of the extension.
+						</Text>
+
+						<Box
+							className={`${themeClasses.bgCard} p-4 rounded border ${themeClasses.border} shadow-sm`}
+						>
+							<HStack justify='space-between' align='center'>
+								<VStack align='start' spacing={1}>
+									<Text className={`font-semibold ${themeClasses.text}`}>Theme</Text>
+									<Text className={`text-xs ${themeClasses.textMuted} capitalize`}>
+										{theme === 'system' ? `System (${getSystemTheme()})` : theme}
+									</Text>
+								</VStack>
+
+								<FormControl className='!w-fit ml-auto rounded-md'>
+									<Select
+										value={theme}
+										onChange={(e) => onThemeChange(e.target.value as 'light' | 'dark' | 'system')}
+										size='sm'
+										width='200px'
+										rounded={'md'}
+										className={`${themeClasses.input}`}
+									>
+										<option value='system'>System</option>
+										<option value='light'>Light</option>
+										<option value='dark'>Dark</option>
+									</Select>
+								</FormControl>
+							</HStack>
+						</Box>
+					</Box>
+
+					<Divider borderColor='gray.300' />
+
 					{/* Data Management Section */}
 					<Box>
-						<Text className='font-bold text-xl text-gray-800 mb-2'>Data Management</Text>
-						<Text className='text-gray-600 text-sm mb-3'>
+						<Text className={`font-bold text-xl ${themeClasses.text} mb-2`}>Data Management</Text>
+						<Text className={`${themeClasses.textSecondary} text-sm mb-3`}>
 							Export and import your API mocking environments for backup or sharing.
 						</Text>
 
-						<Box className='bg-white p-4 rounded border border-gray-200 shadow-sm'>
+						<Box
+							className={`${themeClasses.bgCard} p-4 rounded border ${themeClasses.border} shadow-sm`}
+						>
 							<HStack justify='space-between' align='center'>
 								<VStack align='start' spacing={1}>
-									<Text className='font-semibold text-gray-800'>Export Rules</Text>
-									<Text className='text-gray-600 text-sm'>
+									<Text className={`font-semibold ${themeClasses.text}`}>Export Rules</Text>
+									<Text className={`${themeClasses.textSecondary} text-sm`}>
 										Download all your environments as a JSON file
 									</Text>
 								</VStack>
@@ -92,11 +150,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 							</HStack>
 						</Box>
 
-						<Box className='bg-white p-4 rounded border border-gray-200 shadow-sm mt-2'>
+						<Box
+							className={`${themeClasses.bgCard} p-4 rounded border ${themeClasses.border} shadow-sm mt-2`}
+						>
 							<HStack justify='space-between' align='center'>
 								<VStack align='start' spacing={1}>
-									<Text className='font-semibold text-gray-800'>Import Rules</Text>
-									<Text className='text-gray-600 text-sm'>
+									<Text className={`font-semibold ${themeClasses.text}`}>Import Rules</Text>
+									<Text className={`${themeClasses.textSecondary} text-sm`}>
 										Upload a JSON file to restore your environments
 									</Text>
 								</VStack>
@@ -120,13 +180,13 @@ const SettingsPage: React.FC<SettingsPageProps> = ({
 
 					{/* Danger Zone Section */}
 					<Box>
-						<Text className='font-bold text-xl text-gray-800 mb-1'>Danger Zone</Text>
+						<Text className={`font-bold text-xl ${themeClasses.text} mb-1`}>Danger Zone</Text>
 
-						<Box className='border border-red-300 rounded p-4 bg-white shadow-sm'>
+						<Box className={`border border-red-300 rounded p-4 ${themeClasses.bgCard} shadow-sm`}>
 							<HStack justify='space-between' align='center'>
 								<VStack align='start' spacing={1}>
-									<Text className='font-semibold text-gray-800'>Delete All Rules</Text>
-									<Text className='text-gray-600 text-sm'>
+									<Text className={`font-semibold ${themeClasses.text}`}>Delete All Rules</Text>
+									<Text className={`${themeClasses.textSecondary} text-sm`}>
 										This will permanently delete all {environmentCount} environments. This action
 										cannot be undone.
 									</Text>

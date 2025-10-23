@@ -13,6 +13,7 @@ import {
 import React from 'react';
 import { FiDownload, FiServer, FiUpload } from 'react-icons/fi';
 import { Environment } from '../../types';
+import { getThemeClasses, useTheme } from '../contexts/ThemeContext';
 import DeleteWarningDialog, { useDeleteDialogState } from './DeleteWarningDialog';
 
 interface EnvironmentPageProps {
@@ -36,6 +37,9 @@ const EnvironmentPage: React.FC<EnvironmentPageProps> = ({
 	onExportEnvironmentRules,
 	onImportEnvironmentRules,
 }) => {
+	const { theme } = useTheme();
+	const themeClasses = getThemeClasses(theme);
+
 	const {
 		isOpen: isDeleteDialogOpen,
 		id: deleteId,
@@ -60,13 +64,13 @@ const EnvironmentPage: React.FC<EnvironmentPageProps> = ({
 	};
 
 	return (
-		<Box className='w-full h-full bg-gray-50 text-gray-800'>
+		<Box className={`w-full h-full ${themeClasses.bg} ${themeClasses.text}`}>
 			{/* Header with close button and add button */}
-			<Box className='bg-white p-4 border-b border-gray-200'>
+			<Box className={`${themeClasses.bgHeader} p-4 border-b ${themeClasses.border}`}>
 				<HStack justify='space-between' align='center'>
 					<HStack spacing={3}>
-						<FiServer size={24} className='text-gray-600' />
-						<Text className='font-bold text-xl text-gray-800'>Environments</Text>
+						<FiServer size={24} className={themeClasses.textSecondary} />
+						<Text className={`font-bold text-xl ${themeClasses.text}`}>Environments</Text>
 					</HStack>
 					<HStack spacing={2}>
 						<Tooltip label='Add New Environment' placement='bottom'>
@@ -98,7 +102,10 @@ const EnvironmentPage: React.FC<EnvironmentPageProps> = ({
 				<VStack spacing={4} align='stretch'>
 					<VStack spacing={2} align='stretch' className=''>
 						{environments.map((env) => (
-							<Box key={env.id} className='bg-white p-3 rounded border border-gray-200 shadow-sm'>
+							<Box
+								key={env.id}
+								className={`${themeClasses.bgCard} p-3 rounded border ${themeClasses.border} shadow-sm`}
+							>
 								<HStack justify='space-between' align='center'>
 									<FormControl>
 										<Input
@@ -107,7 +114,7 @@ const EnvironmentPage: React.FC<EnvironmentPageProps> = ({
 											value={env.name}
 											onChange={(e) => onUpdateEnvironment(env.id, e.target.value)}
 											placeholder='Environment name'
-											className='font-mono text-xs flex-1 mr-3'
+											className={`font-mono text-xs flex-1 mr-3 ${themeClasses.input}`}
 										/>
 									</FormControl>
 									<HStack spacing={2}>
