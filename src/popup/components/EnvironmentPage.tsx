@@ -11,6 +11,7 @@ import {
 	VStack,
 } from '@chakra-ui/react';
 import React from 'react';
+import { FiDownload, FiServer, FiUpload } from 'react-icons/fi';
 import { Environment } from '../../types';
 import DeleteWarningDialog, { useDeleteDialogState } from './DeleteWarningDialog';
 
@@ -20,6 +21,8 @@ interface EnvironmentPageProps {
 	onDeleteEnvironment: (envId: string) => void;
 	onUpdateEnvironment: (envId: string, name: string) => void;
 	onEnvironmentStatusUpdate: (envId: string, enabled: boolean) => void;
+	onExportEnvironmentRules: (envId: string) => void;
+	onImportEnvironmentRules: (envId: string) => void;
 	onClose: () => void;
 }
 
@@ -30,6 +33,8 @@ const EnvironmentPage: React.FC<EnvironmentPageProps> = ({
 	onDeleteEnvironment,
 	onUpdateEnvironment,
 	onClose,
+	onExportEnvironmentRules,
+	onImportEnvironmentRules,
 }) => {
 	const {
 		isOpen: isDeleteDialogOpen,
@@ -53,12 +58,16 @@ const EnvironmentPage: React.FC<EnvironmentPageProps> = ({
 	const handleDeleteCancel = () => {
 		closeDeleteDialog();
 	};
+
 	return (
 		<Box className='w-full h-full bg-gray-50 text-gray-800'>
 			{/* Header with close button and add button */}
 			<Box className='bg-white p-4 border-b border-gray-200'>
 				<HStack justify='space-between' align='center'>
-					<Text className='font-bold text-xl text-gray-800'>Environments</Text>
+					<HStack spacing={3}>
+						<FiServer size={24} className='text-gray-600' />
+						<Text className='font-bold text-xl text-gray-800'>Environments</Text>
+					</HStack>
 					<HStack spacing={2}>
 						<Tooltip label='Add New Environment' placement='bottom'>
 							<IconButton
@@ -108,6 +117,27 @@ const EnvironmentPage: React.FC<EnvironmentPageProps> = ({
 											colorScheme='green'
 											size='sm'
 										/>
+
+										<Tooltip label='Import Environment' placement='bottom'>
+											<IconButton
+												aria-label='Import Rules'
+												icon={<FiDownload />}
+												onClick={() => onImportEnvironmentRules(env.id)}
+												size='sm'
+												variant='outline'
+												colorScheme='purple'
+											/>
+										</Tooltip>
+										<Tooltip label='Export Environment' placement='bottom'>
+											<IconButton
+												aria-label='Export Rules'
+												icon={<FiUpload />}
+												onClick={() => onExportEnvironmentRules(env.id)}
+												size='sm'
+												variant='outline'
+												colorScheme='purple'
+											/>
+										</Tooltip>
 										{env.id !== 'default' && (
 											<Tooltip label='Delete Environment' placement='bottom'>
 												<IconButton

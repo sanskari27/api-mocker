@@ -42,10 +42,14 @@ export const usePopupState = () => {
 			if (response.success) {
 				const state = response.data;
 				// Ensure rules is always an array
+				const environments: Environment[] = Array.isArray(state.environments)
+					? state.environments
+					: [];
+				const rules = environments.find((env) => env.enabled)?.rules ?? [];
 				const safeState = {
 					enabled: state.enabled || false,
-					rules: Array.isArray(state.rules) ? state.rules : [],
-					environments: Array.isArray(state.environments) ? state.environments : [],
+					rules: rules,
+					environments: environments,
 				};
 				setPopupState(safeState);
 			}
@@ -124,6 +128,11 @@ export const usePopupState = () => {
 
 			if (!response.success) {
 				throw new Error('Failed to save environments');
+			}
+
+			if (response.environmentStateUpdated) {
+				const rules = environments.find((env) => env.enabled)?.rules ?? [];
+				setPopupState((prev) => ({ ...prev, rules }));
 			}
 		} catch (err) {
 			toast({

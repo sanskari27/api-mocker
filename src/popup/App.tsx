@@ -9,24 +9,20 @@ const App: React.FC = () => {
 	const { popupState, setPopupState, loading, toggleMocking, saveRules, saveEnvironments } =
 		usePopupState();
 
-	const {
-		addNewRule,
-		updateRule,
-		deleteRule,
-		cloneRule,
-		updateRuleHeaders,
-		getRuleCount,
-		clearAllRules,
-		exportRules,
-		importRules,
-	} = useRuleManagement({ popupState, setPopupState, saveRules });
+	const { addNewRule, updateRule, deleteRule, cloneRule, updateRuleHeaders, getRuleCount } =
+		useRuleManagement({ popupState, setPopupState, saveRules });
 
 	const {
-		onAddEnvironment,
-		updateEnvironment,
-		onUpdateEnvironment,
-		onDeleteEnvironment,
-		onToggleEnvironmentStatus,
+		getEnvironmentCount,
+		addNewEnvironment,
+		updateEnvironmentName,
+		deleteEnvironment,
+		toggleEnvironmentStatus,
+		clearAllEnvironments,
+		exportAllEnvironments,
+		exportSingleEnvironment,
+		importEnvironments,
+		importSingleEnvironment,
 	} = useEnvironments({ popupState, setPopupState, saveEnvironments });
 
 	if (loading) {
@@ -42,21 +38,23 @@ const App: React.FC = () => {
 		return (
 			<SettingsPage
 				onClose={() => setCurrentPage('home')}
-				onExportRules={exportRules}
-				onImportRules={importRules}
-				onClearAllRules={clearAllRules}
-				ruleCount={getRuleCount()}
+				onExportEnvironments={exportAllEnvironments}
+				onImportEnvironments={importEnvironments}
+				onClearAllEnvironments={clearAllEnvironments}
+				environmentCount={getEnvironmentCount()}
 			/>
 		);
 	} else if (currentPage === 'environments') {
 		return (
 			<EnvironmentPage
 				environments={popupState.environments}
-				onEnvironmentStatusUpdate={onToggleEnvironmentStatus}
-				onAddEnvironment={onAddEnvironment}
-				onDeleteEnvironment={onDeleteEnvironment}
-				onUpdateEnvironment={onUpdateEnvironment}
+				onEnvironmentStatusUpdate={toggleEnvironmentStatus}
+				onAddEnvironment={addNewEnvironment}
+				onDeleteEnvironment={deleteEnvironment}
+				onUpdateEnvironment={updateEnvironmentName}
 				onClose={() => setCurrentPage('home')}
+				onExportEnvironmentRules={exportSingleEnvironment}
+				onImportEnvironmentRules={importSingleEnvironment}
 			/>
 		);
 	}

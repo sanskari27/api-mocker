@@ -36,13 +36,13 @@ class BackgroundService {
 		const result = await chrome.storage.local.get(this.storageKey);
 		if (!result[this.storageKey]) {
 			const initialData: StorageData = {
-				globalRules: [],
 				tabStates: {},
 				environments: [
 					{
 						id: 'default',
 						name: 'Default',
 						enabled: true,
+						rules: [],
 					},
 				],
 			};
@@ -107,17 +107,15 @@ class BackgroundService {
 
 	private async getStorageData(): Promise<StorageData> {
 		const result = await chrome.storage.local.get(this.storageKey);
-		const data = result[this.storageKey] || { globalRules: [], tabStates: {}, environments: [] };
-
-		// Initialize requestCount and enabled for existing rules that don't have them
-		data.globalRules = (data.globalRules ?? []).map((rule: MockRule) => ({
-			...rule,
-			requestCount: rule.requestCount || 0,
-			enabled: rule.enabled !== false, // Default to true for backward compatibility
-		}));
+		const data = result[this.storageKey] || { tabStates: {}, environments: [] };
 
 		data.environments = (data.environments ?? []).map((environment: Environment) => ({
 			...environment,
+			rules: (environment.rules ?? []).map((rule: MockRule) => ({
+				...rule,
+				requestCount: rule.requestCount || 0,
+				enabled: rule.enabled !== false, // Default to true for backward compatibility
+			})),
 			enabled: environment.enabled !== false, // Default to true for backward compatibility
 		}));
 
@@ -165,7 +163,6 @@ class BackgroundService {
 
 		const responseData = {
 			enabled: tabState.enabled,
-			rules: data.globalRules,
 			environments: data.environments,
 		};
 		sendResponse({ success: true, data: responseData });
@@ -177,6 +174,7 @@ class BackgroundService {
 		sendResponse: (response: any) => void
 	): Promise<void> {
 		const data = await this.getStorageData();
+		const activeEnvironment = await this.getActiveEnvironment();
 		const tabIdStr = tabId.toString();
 
 		if (!data.tabStates[tabIdStr]) {
@@ -194,7 +192,7 @@ class BackgroundService {
 			await chrome.tabs.sendMessage(tabId, {
 				type: 'MOCKING_STATE_CHANGED',
 				enabled: enabled,
-				rules: data.globalRules,
+				rules: activeEnvironment?.rules ?? [],
 			});
 		} catch (error) {
 			// Silently handle message sending errors
@@ -204,8 +202,8 @@ class BackgroundService {
 	}
 
 	private async getRules(tabId: number, sendResponse: (response: any) => void): Promise<void> {
-		const data = await this.getStorageData();
-		sendResponse({ success: true, data: data.globalRules });
+		const activeEnvironment = await this.getActiveEnvironment();
+		sendResponse({ success: true, data: activeEnvironment?.rules ?? [] });
 	}
 
 	private async setRules(
@@ -215,12 +213,57 @@ class BackgroundService {
 	): Promise<void> {
 		const data = await this.getStorageData();
 
+		// Update active environment
+		const activeEnv = await this.getActiveEnvironment();
+		data.environments = data.environments.map((env) =>
+			env.id === activeEnv?.id ? { ...env, rules: rules } : env
+		);
+
+		console.log('setRules data.environments', data.environments);
+		console.log('setRules activeEnv', activeEnv?.id);
+
+		await this.saveStorageData(data);
+		await this.notifyTabsRulesUpdated(rules);
+		sendResponse({ success: true });
+	}
+
+	private async getActiveEnvironment(): Promise<Environment | undefined> {
+		const data = await this.getStorageData();
+		return data.environments.find((environment: Environment) => environment.enabled);
+	}
+
+	private async getEnvironments(
+		tabId: number,
+		sendResponse: (response: any) => void
+	): Promise<void> {
+		const data = await this.getStorageData();
+		sendResponse({ success: true, data: data.environments });
+	}
+
+	private async setEnvironments(
+		tabId: number,
+		environments: Environment[],
+		sendResponse: (response: any) => void
+	): Promise<void> {
+		const data = await this.getStorageData();
+		const prevActiveEnvironment = await this.getActiveEnvironment();
+
 		// Update global rules
-		data.globalRules = rules;
+		data.environments = environments;
 		await this.saveStorageData(data);
 
-		// Notify all tabs with mocking enabled about rule changes
+		const activeEnvironment = await this.getActiveEnvironment();
+		const environmentStateUpdated = activeEnvironment?.id !== prevActiveEnvironment?.id;
+
+		if (environmentStateUpdated) {
+			await this.notifyTabsRulesUpdated(activeEnvironment?.rules ?? []);
+		}
+		sendResponse({ success: true, environmentStateUpdated: environmentStateUpdated });
+	}
+
+	private async notifyTabsRulesUpdated(rules: MockRule[]): Promise<void> {
 		try {
+			const data = await this.getStorageData();
 			const tabs = await chrome.tabs.query({});
 			for (const tab of tabs) {
 				if (tab.id) {
@@ -241,57 +284,11 @@ class BackgroundService {
 		} catch (error) {
 			// Silently handle message sending errors
 		}
-
-		sendResponse({ success: true });
-	}
-
-	private async getEnvironments(
-		tabId: number,
-		sendResponse: (response: any) => void
-	): Promise<void> {
-		const data = await this.getStorageData();
-		sendResponse({ success: true, data: data.environments });
-	}
-
-	private async setEnvironments(
-		tabId: number,
-		environments: Environment[],
-		sendResponse: (response: any) => void
-	): Promise<void> {
-		const data = await this.getStorageData();
-
-		// Update global rules
-		data.environments = environments;
-		await this.saveStorageData(data);
-
-		// Notify all tabs with mocking enabled about rule changes
-		try {
-			const tabs = await chrome.tabs.query({});
-			for (const tab of tabs) {
-				if (tab.id) {
-					const tabState = data.tabStates[tab.id.toString()];
-					if (tabState && tabState.enabled) {
-						try {
-							await chrome.tabs.sendMessage(tab.id, {
-								type: 'ENVIRONMENTS_UPDATED',
-								environments: environments,
-								enabled: true,
-							});
-						} catch (error) {
-							// Tab might be closed or not ready, ignore
-						}
-					}
-				}
-			}
-		} catch (error) {
-			// Silently handle message sending errors
-		}
-
-		sendResponse({ success: true });
 	}
 
 	private async toggleMocking(tabId: number, sendResponse: (response: any) => void): Promise<void> {
 		const data = await this.getStorageData();
+		const activeEnvironment = await this.getActiveEnvironment();
 		const tabIdStr = tabId.toString();
 
 		if (!data.tabStates[tabIdStr]) {
@@ -309,7 +306,7 @@ class BackgroundService {
 			await chrome.tabs.sendMessage(tabId, {
 				type: 'MOCKING_STATE_CHANGED',
 				enabled: data.tabStates[tabIdStr].enabled,
-				rules: data.globalRules,
+				rules: activeEnvironment?.rules ?? [],
 			});
 		} catch (error) {
 			// Silently handle message sending errors
@@ -326,12 +323,13 @@ class BackgroundService {
 		sendResponse: (response: any) => void
 	): Promise<void> {
 		const data = await this.getStorageData();
+		const activeEnvironment = await this.getActiveEnvironment();
+		const rules = activeEnvironment?.rules ?? [];
 
 		// Find the rule and increment its request count
-		const ruleIndex = data.globalRules.findIndex((rule) => rule.id === ruleId);
+		const ruleIndex = rules.findIndex((rule) => rule.id === ruleId);
 		if (ruleIndex !== -1) {
-			data.globalRules[ruleIndex].requestCount =
-				(data.globalRules[ruleIndex].requestCount || 0) + 1;
+			rules[ruleIndex].requestCount = (rules[ruleIndex].requestCount || 0) + 1;
 			await this.saveStorageData(data);
 
 			// Notify all tabs with mocking enabled about the updated rule
@@ -344,7 +342,7 @@ class BackgroundService {
 							try {
 								await chrome.tabs.sendMessage(tab.id, {
 									type: 'RULES_UPDATED',
-									rules: data.globalRules,
+									rules: rules,
 									enabled: true,
 								});
 							} catch (error) {
@@ -357,7 +355,7 @@ class BackgroundService {
 				// Silently handle message sending errors
 			}
 
-			sendResponse({ success: true, requestCount: data.globalRules[ruleIndex].requestCount });
+			sendResponse({ success: true, requestCount: rules[ruleIndex].requestCount });
 		} else {
 			sendResponse({ success: false, error: 'Rule not found' });
 		}

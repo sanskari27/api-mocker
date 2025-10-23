@@ -14,7 +14,6 @@ export interface TabMockState {
 }
 
 export interface StorageData {
-	globalRules: MockRule[];
 	environments: Environment[];
 	tabStates: { [tabId: string]: TabMockState };
 }
@@ -25,6 +24,7 @@ export interface MessageData {
 		| 'SET_TAB_STATE'
 		| 'GET_RULES'
 		| 'SET_RULES'
+		| 'GET_ACTIVE_ENVIRONMENT'
 		| 'GET_ENVIRONMENTS'
 		| 'SET_ENVIRONMENTS'
 		| 'TOGGLE_MOCKING'
@@ -49,4 +49,5 @@ export interface Environment {
 	id: string;
 	name: string;
 	enabled: boolean;
+	rules: MockRule[];
 }
